@@ -1,3 +1,4 @@
+function I_NMDA = loop_original(spktimes_all)
 %% All global variables used:
 numDendrites = 120;% (constant)
 t = 10001;% (constant)
@@ -7,7 +8,7 @@ NMDA.I_f = 70; %(constant)
 NMDA.tau_f = 50; % (constant)
 NMDA.I_s = 30; % (constant)
 NMDA.tau_s = 200;% (constant)
-% I_NMDA (matrix: numDendrites x 1. This is what we are updating element-wise in the loop right now.)
+% I_NMDA (matrix: numDendrites x 1. This is what we are updating element-wise in the loop right now, i.e. the result.)
 g_NMDA = 0.0045; % (constant)
 H = 0.0531; % (constant)
 

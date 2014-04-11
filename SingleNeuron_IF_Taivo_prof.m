@@ -97,7 +97,7 @@ spktimes_all = [];
 
 % Time window to check in the past for release of neurotransmitter
 val=5*(NMDA.tau_f+NMDA.tau_s)/dt;
-fprintf('The value of the variable val=%.3f',val);
+%fprintf('The value of the variable val=%.3f',val);
 
 % Set maximal conductivities for inh and exc synapses
 gInh = g_IP;
@@ -140,7 +140,7 @@ for t=1: Tsim                       % Loop over time
                      
         if largebin == 0
             spktimes_all = spktimes;
-            elseF
+        else
             spktimes_all = [spktimes_all (spktimes + 10000 * largebin)];
         end;
         %-- input spikes generated
@@ -313,10 +313,10 @@ fprintf('Simulation time: %dms, total computing time: %.1fs.\n', T0, totalComput
 %FigWeightHistograms(gExc,gInh,g_plas0,g_plas,rE,rI,endExc,numDendrites-endExc,rate_Input,T0,dt,I0)
 
 
-%% Write data to file
-fileName = sprintf('out_last5_%s.mat', datestr(now,'yyyy-mm-dd_HH-MM-SS'));
-cd data_out;
-% Save all the relevant stuff
-%octave: save('-mat7-binary', fileName, 'rate_Input','T0','dt','I0','gExc','gInh','Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites','totalComputingTime');
-save(fileName, 'rate_Input', 'rate_Output','T0','dt','I0','gExc','gInh','Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites','totalComputingTime','enableMetaplasticity','enableInhplasticity','spktimes_all','Ca_history','spikes_post','g_plas_history', 'spikes_last5sec','rate_Output5');
-cd ..;
+% %% Write data to file
+% fileName = sprintf('out_last5_%s.mat', datestr(now,'yyyy-mm-dd_HH-MM-SS'));
+% cd data_out;
+% % Save all the relevant stuff
+% %octave: save('-mat7-binary', fileName, 'rate_Input','T0','dt','I0','gExc','gInh','Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites','totalComputingTime');
+% save(fileName, 'rate_Input', 'rate_Output','T0','dt','I0','gExc','gInh','Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites','totalComputingTime','enableMetaplasticity','enableInhplasticity','spktimes_all','Ca_history','spikes_post','g_plas_history', 'spikes_last5sec','rate_Output5');
+% cd ..;

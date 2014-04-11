@@ -1,0 +1,15 @@
+for testNo=1:numTests
+
+% Generate an input matrix:
+in = load('testdata/spk1.mat');
+spktimes_all = in.spktimes_all;
+
+% Run both codes
+result_original = loop_original(spktimes_all);
+result_vectorised = loop_vectorised(spktimes_all);
+
+if result_original == result_vectorised
+    fprintf('Test OK.\n');
+else
+    fprintf('Test failed.');
+end;
