@@ -1,4 +1,4 @@
-numTests = 3; % How many tests do we have? (Need to have enough data files in ./testdata)
+numTests = 5; % How many tests do we have? (Need to have enough data files in ./testdata)
 testsOK = [];
 testsFailed = [];
 
