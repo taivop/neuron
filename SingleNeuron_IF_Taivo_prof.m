@@ -314,9 +314,10 @@ fprintf('Simulation time: %dms, total computing time: %.1fs.\n', T0, totalComput
 
 
 % %% Write data to file
-% fileName = sprintf('out_last5_%s.mat', datestr(now,'yyyy-mm-dd_HH-MM-SS'));
-% cd data_out;
+fileName = sprintf('out_last5_%s.mat', datestr(now,'yyyy-mm-dd_HH-MM-SS'));
+cd vectorising\testdata;
 % % Save all the relevant stuff
 % %octave: save('-mat7-binary', fileName, 'rate_Input','T0','dt','I0','gExc','gInh','Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites','totalComputingTime');
-% save(fileName, 'rate_Input', 'rate_Output','T0','dt','I0','gExc','gInh','Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites','totalComputingTime','enableMetaplasticity','enableInhplasticity','spktimes_all','Ca_history','spikes_post','g_plas_history', 'spikes_last5sec','rate_Output5');
-% cd ..;
+save(fileName, 'spktimes_all');
+cd ..;
+cd ..;
