@@ -1,4 +1,7 @@
-function [g_plas, rate_Output] = SingleNeuron_IF_Taivo_prof(T0, rate_Input, initialWeight)
+T0 = 1000;
+rate_Input = 30;
+initialWeight = 1;
+
 %% Script initialization
 simulationStartTime = clock;
 
@@ -137,7 +140,7 @@ for t=1: Tsim                       % Loop over time
                      
         if largebin == 0
             spktimes_all = spktimes;
-        else
+            elseF
             spktimes_all = [spktimes_all (spktimes + 10000 * largebin)];
         end;
         %-- input spikes generated
