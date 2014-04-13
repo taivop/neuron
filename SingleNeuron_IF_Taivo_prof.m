@@ -1,4 +1,4 @@
-T0 = 1000;
+T0 = 5000;
 rate_Input = 30;
 initialWeight = 1;
 
@@ -105,6 +105,8 @@ gExc = g_PP;
 
 %% MAIN LOOP
 
+timepoints = [];
+
 disp('Running main loop...');
 waitbar(0);
 for t=1: Tsim                       % Loop over time
@@ -170,6 +172,7 @@ for t=1: Tsim                       % Loop over time
     end;
    
     if (mod(t,100)==0)
+         timepoints = [timepoints cputime];
          waitbar(t/Tsim)                  % Progressbar
     end;
                          

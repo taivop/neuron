@@ -19,24 +19,25 @@ H = 0.0531; % (constant)
 % f (unimportant intermediate variable)
         
 %% Vectorised
-(spktimes_all<t)&(spktimes_all>0)&(spktimes_all>(t-val))
-t_kernel_f_NMDA = t - spktimes_all(:,(spktimes_all<t)&(spktimes_all>0)&(spktimes_all>(t-val)));
-f = sum(NMDA.I_f*exp(-t_kernel_f_NMDA./NMDA.tau_f)+NMDA.I_s*exp(-t_kernel_f_NMDA/NMDA.tau_s),2);
-I_NMDA = g_NMDA*f*H;
-
+smallerMat = spktimes_all(spktimes_all>0 & spktimes_all<t & spktimes_all>(t-val));
+%ind2sub, sub2ind, [row,col]=find(a>0&a<8) või a(a>0&a<8)
+% t_kernel_f_NMDA = t - spktimes_all(:,(spktimes_all<t)&(spktimes_all>0)&(spktimes_all>(t-val)));
+% f = sum(NMDA.I_f*exp(-t_kernel_f_NMDA./NMDA.tau_f)+NMDA.I_s*exp(-t_kernel_f_NMDA/NMDA.tau_s),2);
+% I_NMDA = g_NMDA*f*H;
 
 %% Original loop
-%           for d0 = 1:numDendrites                                 % NMDA currents for all synapses
-%                 %TODO this is very probably the faulty line.
-%                t_kernel_f_NMDA = t - spktimes_all(d0,(spktimes_all(d0,:)<t)&(spktimes_all(d0,:)>0)&(spktimes_all(d0,:)>(t-val)));
-%                
-%                % Implicitly assuming that the 'degree of openness' of all ion channels on a dendrite sum up linearly
-%                % Probably should try to simulate saturation?
-%                f = sum(NMDA.I_f*exp(-t_kernel_f_NMDA./NMDA.tau_f)+NMDA.I_s*exp(-t_kernel_f_NMDA/NMDA.tau_s));
-%                               
-%                % NMDA currents
-%                %if ~(isempty(f))
-%                     I_NMDA(d0) = g_NMDA*f*H;  % f vector inputs, H 1 number
-%                     % in article, there is another factor P0 = 0.5, which is the fraction of NMDARs in the closed state that shift to the open state after each presynaptic spike
-%                %end
-%           end
+% TODO: we need to use only two last seconds of input spikes (to be exact, last 1250ms)
+          for d0 = 1:numDendrites                                 % NMDA currents for all synapses
+               smallerMat = spktimes_all(d0,(spktimes_all(d0,:)<t)&(spktimes_all(d0,:)>0)&(spktimes_all(d0,:)>(t-val)));
+               t_kernel_f_NMDA = t - smallerMat;
+
+               f = sum(NMDA.I_f*exp(-t_kernel_f_NMDA./NMDA.tau_f)+NMDA.I_s*exp(-t_kernel_f_NMDA/NMDA.tau_s));
+                              
+               % NMDA currents
+               %if ~(isempty(f))
+                    I_NMDA(d0) = g_NMDA*f*H;  % f vector inputs, H 1 number
+                    % in article, there is another factor P0 = 0.5, which is the fraction of NMDARs in the closed state that shift to the open state after each presynaptic spike
+               %end
+          end
+          
+      
