@@ -1,7 +1,4 @@
-T0 = 1000;
-rate_Input = 30;
-initialWeight = 1;
-
+function [g_plas, rate_Output] = SingleNeuron_IF_Taivo_vectorised(T0, rate_Input, initialWeight)
 %% Script initialization
 simulationStartTime = clock;
 
@@ -97,15 +94,12 @@ spktimes_all = [];
 
 % Time window to check in the past for release of neurotransmitter
 val=5*(NMDA.tau_f+NMDA.tau_s)/dt;
-%fprintf('The value of the variable val=%.3f',val);
 
 % Set maximal conductivities for inh and exc synapses
 gInh = g_IP;
 gExc = g_PP;
 
 %% MAIN LOOP
-
-timepoints = [];
 
 disp('Running main loop...');
 waitbar(0);
@@ -172,7 +166,6 @@ for t=1: Tsim                       % Loop over time
     end;
    
     if (mod(t,100)==0)
-         timepoints = [timepoints cputime];
          waitbar(t/Tsim)                  % Progressbar
     end;
                          
@@ -231,7 +224,6 @@ for t=1: Tsim                       % Loop over time
           % Only look at recent spikes
           % Might be inefficient; possibly keep track of the first spike in the past that might interest us
           %TODO look here
-
           t_kernel =  t - spikes_post(spikes_post>(t-(5*(BPAP.tau_f+BPAP.tau_s)/dt)));
           kernel_BPAP = BPAP.V_amp*(BPAP.I_f*exp(-t_kernel./BPAP.tau_f)+BPAP.I_s*exp(-t_kernel/BPAP.tau_s));
          
@@ -241,36 +233,16 @@ for t=1: Tsim                       % Loop over time
                 
           I_NMDA = zeros(numDendrites,1);
           
-          for d0 = 1:numDendrites                                 % NMDA currents for all synapses
-              
-              % The next two lines take most (>90%) computation time
-              
-                %spktimes_small = spktimes_all(:,
-               t_kernel_f_NMDA = t - spktimes_all(d0,(spktimes_all(d0,:)<t)&(spktimes_all(d0,:)>0)&(spktimes_all(d0,:)>(t-val)));
-               
-               % Implicitly assuming that the 'degree of openness' of all ion channels on a dendrite sum up linearly
-               % Probably should try to simulate saturation?
-               INTER1=NMDA.I_f*exp(-t_kernel_f_NMDA./NMDA.tau_f);
-               INTER2=NMDA.I_s*exp(-t_kernel_f_NMDA./NMDA.tau_s);
-               f = sum(INTER1+INTER2);
-               
-               % for debugging
-%                history = [history sum(sum(t_kernel_f_NMDA))];
-%                if d0==1
-%                    if t==1
-%                        history = sum(t_kernel_f_NMDA);
-%                    else
-%                        history = [history sum(t_kernel_f_NMDA)];
-%                    end;
-%                end;
-               
-               % NMDA currents
-               %if ~(isempty(f))
-                    I_NMDA(d0) = g_NMDA*f*H;  % f vector inputs, H 1 number
-                    % in article, there is another factor P0 = 0.5, which is the fraction of NMDARs in the closed state that shift to the open state after each presynaptic spike
-               %end
-          end
-          
+          % ---START former loop
+          t_kernel_f_NMDA = (t - spktimes_all) .* (spktimes_all>0 & spktimes_all<t & spktimes_all>(t-val));
+          tauf = -t_kernel_f_NMDA./NMDA.tau_f;
+          taus = -t_kernel_f_NMDA./NMDA.tau_s;
+          tauf(tauf==0) = -Inf;
+          taus(taus==0) = -Inf;
+          f = sum(NMDA.I_f*exp(tauf)+NMDA.I_s*exp(taus),2);
+          I_NMDA = (g_NMDA*f*H);
+          % ---END former loop
+          %fprintf('size of vectorised I_NMDA is %dx%d\n',size(I_NMDA,1),size(I_NMDA,2));
           
           % Learning curve and slope
           omega = learning_curve(learn_curve,Ca);
@@ -316,11 +288,10 @@ fprintf('Simulation time: %dms, total computing time: %.1fs.\n', T0, totalComput
 %FigWeightHistograms(gExc,gInh,g_plas0,g_plas,rE,rI,endExc,numDendrites-endExc,rate_Input,T0,dt,I0)
 
 
-% %% Write data to file
+%% Write data to file
 fileName = sprintf('out_last5_%s.mat', datestr(now,'yyyy-mm-dd_HH-MM-SS'));
-cd vectorising\testdata;
-% % Save all the relevant stuff
-% %octave: save('-mat7-binary', fileName, 'rate_Input','T0','dt','I0','gExc','gInh','Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites','totalComputingTime');
-save(fileName, 'spktimes_all');
-cd ..;
+cd data_out;
+% Save all the relevant stuff
+%octave: save('-mat7-binary', fileName, 'rate_Input','T0','dt','I0','gExc','gInh','Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites','totalComputingTime');
+save(fileName, 'rate_Input', 'rate_Output','T0','dt','I0','gExc','gInh','Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites','totalComputingTime','enableMetaplasticity','enableInhplasticity','spktimes_all','Ca_history','spikes_post','g_plas_history', 'spikes_last5sec','rate_Output5');
 cd ..;

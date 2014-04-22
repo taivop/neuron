@@ -32,3 +32,4 @@ H = 0.0531; % (constant)
                     % in article, there is another factor P0 = 0.5, which is the fraction of NMDARs in the closed state that shift to the open state after each presynaptic spike
                %end
           end
+%fprintf('size of original I_NMDA is %dx%d\n',size(I_NMDA,1),size(I_NMDA,2));
