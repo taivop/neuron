@@ -233,31 +233,16 @@ for t=1: Tsim                       % Loop over time
                 
           I_NMDA = zeros(numDendrites,1);
           
-          for d0 = 1:numDendrites                                 % NMDA currents for all synapses
-                %TODO this is very probably the faulty line.
-               t_kernel_f_NMDA = t - spktimes_all(d0,(spktimes_all(d0,:)<t)&(spktimes_all(d0,:)>0)&(spktimes_all(d0,:)>(t-val)));
-               
-               % Implicitly assuming that the 'degree of openness' of all ion channels on a dendrite sum up linearly
-               % Probably should try to simulate saturation?
-               f = sum(NMDA.I_f*exp(-t_kernel_f_NMDA./NMDA.tau_f)+NMDA.I_s*exp(-t_kernel_f_NMDA/NMDA.tau_s));
-               
-               % for debugging
-%                history = [history sum(sum(t_kernel_f_NMDA))];
-%                if d0==1
-%                    if t==1
-%                        history = sum(t_kernel_f_NMDA);
-%                    else
-%                        history = [history sum(t_kernel_f_NMDA)];
-%                    end;
-%                end;
-               
-               % NMDA currents
-               %if ~(isempty(f))
-                    I_NMDA(d0) = g_NMDA*f*H;  % f vector inputs, H 1 number
-                    % in article, there is another factor P0 = 0.5, which is the fraction of NMDARs in the closed state that shift to the open state after each presynaptic spike
-               %end
-          end
-          
+          % ---START former loop
+          t_kernel_f_NMDA = (t - spktimes_all) .* (spktimes_all>0 & spktimes_all<t & spktimes_all>(t-val));
+          tauf = -t_kernel_f_NMDA./NMDA.tau_f;
+          taus = -t_kernel_f_NMDA./NMDA.tau_s;
+          tauf(tauf==0) = -Inf;
+          taus(taus==0) = -Inf;
+          f = sum(NMDA.I_f*exp(tauf)+NMDA.I_s*exp(taus),2);
+          I_NMDA = (g_NMDA*f*H);
+          % ---END former loop
+          %fprintf('size of vectorised I_NMDA is %dx%d\n',size(I_NMDA,1),size(I_NMDA,2));
           
           % Learning curve and slope
           omega = learning_curve(learn_curve,Ca);

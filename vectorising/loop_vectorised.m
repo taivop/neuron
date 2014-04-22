@@ -31,19 +31,3 @@ taus(taus==0) = -Inf;
 f = sum(NMDA.I_f*exp(tauf)+NMDA.I_s*exp(taus),2);
 I_NMDA = g_NMDA*f*H;
 %fprintf('size of vectorised I_NMDA is %dx%d\n',size(I_NMDA,1),size(I_NMDA,2));
-%% Original loop
-% TODO: we need to use only two last seconds of input spikes (to be exact, last 1250ms)
-%           for d0 = 1:numDendrites                                 % NMDA currents for all synapses
-%                smallerMat = spktimes_all(d0,(spktimes_all(d0,:)<t)&(spktimes_all(d0,:)>0)&(spktimes_all(d0,:)>(t-val)));
-%                t_kernel_f_NMDA = t - smallerMat;
-% 
-%                f = sum(NMDA.I_f*exp(-t_kernel_f_NMDA./NMDA.tau_f)+NMDA.I_s*exp(-t_kernel_f_NMDA./NMDA.tau_s));
-%                               
-%                % NMDA currents
-%                %if ~(isempty(f))
-%                     I_NMDA(d0) = g_NMDA*f*H;  % f vector inputs, H 1 number
-%                     % in article, there is another factor P0 = 0.5, which is the fraction of NMDARs in the closed state that shift to the open state after each presynaptic spike
-%                %end
-%           end
-%           
-%       

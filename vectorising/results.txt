@@ -1,0 +1,3 @@
+not restricting # of cores/threads used
+1000ms: 6sec vs 53sec (reduced by a factor of 9)
+4000ms: 33sec vs 220sec (reduced by a factor of 7)

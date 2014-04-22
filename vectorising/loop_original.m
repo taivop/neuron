@@ -17,7 +17,7 @@ H = 0.0531; % (constant)
 % t_kernel_f_NMDA (intermediate variable)
 % f (unimportant intermediate variable)
 
-
+I_NMDA = zeros(numDendrites, 1);
           for d0 = 1:numDendrites                                 % NMDA currents for all synapses
                 %TODO this is very probably the faulty line.
                t_kernel_f_NMDA = t - spktimes_all(d0,(spktimes_all(d0,:)<t)&(spktimes_all(d0,:)>0)&(spktimes_all(d0,:)>(t-val)));
