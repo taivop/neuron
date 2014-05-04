@@ -1,4 +1,5 @@
-function [g_plas, rate_Output] = SingleNeuron_IF_Taivo(T0, rate_Input, initialWeight)
+function [g_plas, rate_Output] = SingleNeuron_IF_Taivo(T0, rate_Input, initialWeight, filename_spec)
+%if filenamespec is 'default' or empty string, use timestamp.
 %% Script initialization
 simulationStartTime = clock;
 
@@ -251,7 +252,7 @@ for t=1: Tsim                       % Loop over time
           % Ca and synaptic weight dynamics
           
           Ca = Ca + dt*(I_NMDA - Ca/Ca_tau);
-          Ca_history = [Ca_history Ca];
+          %Ca_history = [Ca_history Ca];
           
           g_plas = g_plas + dt*(eta.*(omega-syn_decay_NMDA*g_plas));
                     
@@ -289,9 +290,14 @@ fprintf('Simulation time: %dms, total computing time: %.1fs.\n', T0, totalComput
 
 
 %% Write data to file
-fileName = sprintf('out_last5_%s.mat', datestr(now,'yyyy-mm-dd_HH-MM-SS'));
+if strcmpi(filename_spec,'default') | strcmpi(filename_spec,'')
+    fileName = sprintf('out_%s.mat', datestr(now,'yyyy-mm-dd_HH-MM-SS'));
+else
+    fileName = sprintf('out_%s_%s.mat', filename_spec, datestr(now,'yyyy-mm-dd_HH-MM-SS'));
+end;
 cd data_out;
 % Save all the relevant stuff
 %octave: save('-mat7-binary', fileName, 'rate_Input','T0','dt','I0','gExc','gInh','Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites','totalComputingTime');
 save(fileName, 'rate_Input', 'rate_Output','T0','dt','I0','gExc','gInh','Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites','totalComputingTime','enableMetaplasticity','enableInhplasticity','spktimes_all','Ca_history','spikes_post','g_plas_history', 'spikes_last5sec','rate_Output5');
+fprintf('Successfully wrote output to %s\n', fileName);
 cd ..;

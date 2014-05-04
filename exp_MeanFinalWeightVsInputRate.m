@@ -3,11 +3,13 @@ inputFreqs = [1 inputFreqs];
 meanWeights = [];
 
 initialWeight = 1; % This should be kept at 1 during this experiment.
-T0 = 10000; % ms
+T0 = 20000; % ms
+filename_base = 'inputrate';
 
 for inputFreq = inputFreqs
     fprintf('----- RUNNING experiment with input freq %dHz -----\n', inputFreq);
-    g_plas = SingleNeuron_IF_Taivo(T0,inputFreq,initialWeight);
+    filename_spec = sprintf('%s-%dHz', filename_base,inputFreq);
+    g_plas = SingleNeuron_IF_Taivo(T0,inputFreq,initialWeight,filename_spec);
     % Take into account ONLY excitatory neurons
     avg = mean(g_plas(1:100));
     meanWeights = [meanWeights; avg];
