@@ -35,27 +35,6 @@ rI = startInh:numDendrites;      % Inhibitory synapses
 numBins = T0 / 1000;
 
 
-%% Generate initial input spikes
-% desiredCorrelation = 0;
-% 
-% [spikes_binary, spiketimes] = GenerateInputSpikes(endExc, rate_Input, desiredCorrelation, T0, dt, 0);
-% [spikes_binary2, spiketimes2] = GenerateInputSpikes(numDendrites-endExc, rate_Input, 0, T0, dt, 0);
-% 
-% InputBool = [spikes_binary;spikes_binary2];
-% spktimes =  zeros(numDendrites,max(size(spiketimes,2),size(spiketimes2,2)));
-% spktimes(1:endExc,1:size(spiketimes,2)) = spiketimes;
-% spktimes(startInh:numDendrites,1:size(spiketimes2,2)) = spiketimes2;
-% 
-%% Neurotransmitter concentrations from presynaptic spikes
-% 
-% V_Input = InputBool*100-70;
-% 
-% s = zeros(size(InputBool));  % plays as external input drive 
-% for t=2: Tsim   
-%     s(rE,t) = s(rE,t-1) + dt*(((1+tanh(V_Input(rE,t)/10))/2).*(1-s(rE,t-1))/tau_R_E -s(rE,t-1)/tau_D_E);   % neurotransmitter concentration at the synapse
-%     s(rI,t) = s(rI,t-1) + dt*(((1+tanh(V_Input(rI,t)/10))/2).*(1-s(rI,t-1))/tau_R_I -s(rI,t-1)/tau_D_I);   % neurotransmitter concentration at the synapse
-% end
-
 %% Initializations
 %I0 = 0;                            % Make empty matrices to hold basal current values
 V = -60.0 + 10*rand(1);             % Initial postsynaptic voltage
@@ -84,7 +63,7 @@ g_NMDA = stab.gt;                               % Initialize NMDA channel conduc
 %TODO try to divide by 4
 
 Ca_history = [];
-g_plas_history = [];
+g_plas_history = zeros(numDendrites,Tsim/10000);
 
 % Initialisations for some loop internal variables
 oldV    = V-(V_sp_thres);
@@ -116,13 +95,6 @@ for t=1: Tsim                       % Loop over time
         fprintf('t = %5dms\n',largebin * 1000 + t_inner);
         g_plas_history = [g_plas_history g_plas];
         
-%         % Preserve previous spike times, if exist
-%         if largebin >= 1
-%             spktimes_all = [spktimes_all (spktimes + 1000 * largebin)];  % take into account time shift 1000ms per large time bin passed
-%             % TODO: can we do that? Some synapses are padded on the right
-%             % with zeros, maybe should take that into account?
-%             % Yeah, we probably can.
-%         end;
         
         % Generate input spikes
         desiredCorrelation = 0; % desired correlation for input to excitatory synapses
@@ -134,11 +106,15 @@ for t=1: Tsim                       % Loop over time
         spktimes =  zeros(numDendrites,max(size(spiketimes,2),size(spiketimes2,2)));
         spktimes(1:endExc,1:size(spiketimes,2)) = spiketimes;
         spktimes(startInh:numDendrites,1:size(spiketimes2,2)) = spiketimes2;
-                     
+        
+        % We want to keep only the last 1250 ms (the value of 'val').
+        % So let's keep only the last two large bins (the last 2000ms).
         if largebin == 0
-            spktimes_all = spktimes;
+            spktimes_new = spktimes;
+            spktimes_all = spktimes_new;
         else
-            spktimes_all = [spktimes_all (spktimes + 10000 * largebin)];
+            spktimes_all = [spktimes_new (spktimes + 10000 * largebin)];
+            spktimes_new = spktimes + 10000 * largebin;
         end;
         %-- input spikes generated
         
