@@ -2,7 +2,7 @@ inputFreqs = 10:10:60;
 inputFreqs = [1 inputFreqs];
 meanWeights = [];
 
-initialWeight = 1; % This should be kept at 1 during this experiment.
+initialWeight = 0.5; % This is kept constant during this experiment.
 T0 = 20000; % ms
 filename_base = 'inputrate';
 

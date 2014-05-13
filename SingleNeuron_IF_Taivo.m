@@ -1,5 +1,4 @@
 function [g_plas, rate_Output] = SingleNeuron_IF_Taivo(T0, rate_Input, initialWeight, filename_spec)
-%if filenamespec is 'default' or empty string, use timestamp.
 %% Script initialization
 simulationStartTime = clock;
 
@@ -12,10 +11,10 @@ trial_id = 1;                   % Trial identifier
 dt = 0.1;                       % Simulating Time step (ms)
 tw = 0.5;                       % Writing time step (ms)
 Tsim = T0/dt;                   % num of time steps
-enableMetaplasticity = 1;       % enable metaplasticity?
+enableMetaplasticity = 0;       % enable metaplasticity?
 enableInhplasticity = 0;        % enable inhibitory plasticity?
 
-I0 = 0.15;                      % Basal drive to pyramidal neurons (controls basal rate; 1.5 -> gamma freq (about 40-50 Hz) when isolated)
+I0 = 1.5;                      % Basal drive to pyramidal neurons (controls basal rate; 1.5 -> gamma freq (about 40-50 Hz) when isolated)
 fprintf('I0 = %.2f\n', I0);
 
 % Synaptic conductivities
