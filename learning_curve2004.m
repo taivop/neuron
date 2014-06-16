@@ -1,4 +1,4 @@
-function [Omega] = learning_curve(param,Ca)
+function [Omega] = learning_curve2004(param,Ca)
 
 alfa1 = param.alfa1;      % Learning curve parameters (control LPT and LTF threshold)
 beta1 = param.beta1;
@@ -10,8 +10,8 @@ sig2 = exp(beta2.*(Ca-alfa2))./(1+exp(beta2.*(Ca-alfa2)));
 
 
 if Ca < 4
-    Omega = 0.25 + sig2 - 0.25*sig1;
-    % incorrect Omega = sig1 - 0.5 .* sig2;
+    Omega = 0.5 + sig2 - 0.5*sig1;
+    % original: Omega = sig1 - 0.5 .* sig2;
 else
     Omega = 1;
 end

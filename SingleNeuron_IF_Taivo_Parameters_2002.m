@@ -42,11 +42,11 @@ syn_I = -80;                    % Reversal potential of inhibitory synapses
 
 %% PAR: BPAP plasticity
 
-BPAP.V_amp = 44;               % Amplitude of BPAP in mV
+BPAP.V_amp = 100; %was 44               % Amplitude of BPAP in mV
 BPAP.I_f = 0.75;               % Relative magnitude fast component BPAP
 BPAP.I_s = 0.25;               % Relative magnitude slow component BPAP
 BPAP.tau_f = 3;                % Time constant fast component (in ms)
-BPAP.tau_s = 35;               % Time constant slow component (in ms)
+BPAP.tau_s = 25; %was 35               % Time constant slow component (in ms)
 
 %% PAR: NMDA plasticity
 
@@ -60,16 +60,16 @@ NMDA.tau_s = 200;              % Time constant slow component (in ms)
 
 %% PAR: Learning curves
 
-learn_rate_slope = 2e-3;       % Learning rate slope   % RATE of learning % 2e-5
+learn_rate_slope = 2e-5;       % Learning rate slope   % RATE of learning % 2e-5
 % learn_curve.alfa1 = 0.35;    % Learning curve parameters (control LPT and LTF threshold)
 % learn_curve.beta1 = 80;
 % learn_curve.alfa2 = 0.55;
 % learn_curve.beta2 = 80;
 
-learn_curve.alfa1 = 0.25;      % Learning curve parameters (control LPT and LTF threshold)
-learn_curve.beta1 = 60;
-learn_curve.alfa2 = 0.4;
-learn_curve.beta2 = 20;
+learn_curve.alfa1 = 0.35;      % Learning curve parameters (control LPT and LTF threshold)
+learn_curve.beta1 = 80;
+learn_curve.alfa2 = 0.55;
+learn_curve.beta2 = 80;
 %stationary value
 
 % %% PAR: Input trains and # of dendrites
@@ -80,9 +80,10 @@ learn_curve.beta2 = 20;
 
 %% PAR: Various
 
-syn_decay_NMDA = 5e-1;%5e-3         % Lambda penalty for having a too large weight; 1/lambda = max weight
+syn_decay_NMDA = 5e-3;%5e-3         % Lambda penalty for having a too large weight; 1/lambda = max weight
+syn_decay_NMDA = 1;
 
-Ca_tau = 20;                   % Calcium passive decay time constant (in ms)
+Ca_tau = 50; %was 20                 % Calcium passive decay time constant (in ms)
 
 % Long-term synaptic stabilization
 stab.k_minus = 8e-7;           % Kinetic constant removal NMDA already speedy 
