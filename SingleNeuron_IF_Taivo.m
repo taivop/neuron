@@ -1,4 +1,4 @@
-function [g_plas, rate_Output] = SingleNeuron_IF_Taivo(T0, rate_Input, initialWeight, I0, filename_spec)
+function [g_plas, rate_Output] = SingleNeuron_IF_Taivo(T0, rate_Input, initialWeight, filename_spec)
 % T0 - simulation time (in ms), MUST BE MULTIPLE OF 1000ms
 % rate_Input - average input rate to all neurons
 % initialWeight - the initial value of all weights
@@ -19,13 +19,8 @@ enableInhplasticity = 0;        % enable inhibitory plasticity?
 oneInput = 1;                   % enable input from only 1 synapse?
 accelerate = 0;                 % accelerate two parameters 100x?
 
-%I0 = 1.5;                      % Basal drive to pyramidal neurons (controls basal rate; 1.5 -> gamma freq (about 40-50 Hz) when isolated)
+I0 = 0.15;                       % Basal drive to pyramidal neurons (controls basal rate; 1.5 -> gamma freq (about 40-50 Hz) when isolated)
 fprintf('I0 = %.2f\n', I0);
-
-% Synaptic conductivities
-g_PP = 0.017;                    % Maximal synaptic conductivity (AMPA) on pyramidal neurons
-g_IP = 0.1;                     % Maximal synaptic conductivity (GABA) on pyramidal neurons
-% Inhibitory conductivity (g_IP) should range in 2x...20x excitatory conductivity (g_PP)
 
 % Input trains and # of dendrites
 %rate_Input = 15; % Hz
@@ -44,7 +39,6 @@ numBins = T0 / 1000;
 
 
 %% Initializations
-%I0 = 0;                            % Make empty matrices to hold basal current values
 V = -60.0 + 10*rand(1);             % Initial postsynaptic voltage
 
 % Some parameters to describe how open the gates are
@@ -68,7 +62,7 @@ if oneInput
     g_plas(2:end) = 0;
 end;
 g_plas0 = g_plas;                               % Save initial values for plotting later.
-Ca = zeros(numDendrites,1);                      % Array for calcium concentration in dendrites
+Ca = zeros(numDendrites,1);                     % Array for calcium concentration in dendrites
 g_NMDA = stab.gt;                               % Initialize NMDA channel conductivity to stable point.
 
 Ca_history = [];
@@ -97,7 +91,7 @@ gExc = g_PP;
 %% MAIN LOOP
 
 disp('Running main loop...');
-waitbar(0);
+%waitbar(0);
 for t=1: Tsim                       % Loop over time
     largebin = fix((t-1)/10000);     % STARTS FROM ZERO. find out which large time bin we are in
     t_inner = mod(t,10000);          % find out where we are in the current large time bin
@@ -165,7 +159,7 @@ for t=1: Tsim                       % Loop over time
     end;
    
     if (mod(t,100)==0)
-         waitbar(t/Tsim)                  % Progressbar
+         %waitbar(t/Tsim)                  % Progressbar
     end;
                          
                 aM = myPyrGatingFuns.alphaM_P(V);
