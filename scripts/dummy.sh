@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cd ..
 #SBATCH -N 1
 #SBATCH --mem=4096
