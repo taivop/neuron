@@ -1,7 +1,6 @@
-function [g_plas, rate_Output] = SingleNeuron_IF_Taivo(T0, rate_Input, initialWeight, filename_spec)
+function [g_plas, rate_Output] = SingleNeuron_IF_Taivo(T0, rate_Input, filename_spec)
 % T0 - simulation time (in ms), MUST BE MULTIPLE OF 1000ms
 % rate_Input - average input rate to all neurons
-% initialWeight - the initial value of all weights
 % filename_spec - the tag you want to add into the name of the output data file.
 
 %% Script initialization
@@ -21,6 +20,7 @@ accelerate = 0;                 % accelerate two parameters 100x?
 
 I0 = 0.0;                       % Basal drive to pyramidal neurons (controls basal rate; 1.5 -> gamma freq (about 40-50 Hz) when isolated)
 fprintf('I0 = %.2f\n', I0);
+fprintf('lambda = %.2f\n', syn_decay_NMDA);
 
 % Input trains and # of dendrites
 %rate_Input = 15; % Hz
@@ -54,6 +54,8 @@ m = aM./(aM+bM);
 h = aH./(aH+bH);
 n = aN./(aN+bN);
 
+
+initialWeight = 0.25 / syn_decay_NMDA;  % initialise weights to their stable values
 
 % g_plas are the coefficients we use to get conductivities from their base values.
 % They are named 'w' in the article.
@@ -141,7 +143,7 @@ for t=1: Tsim                       % Loop over time
         s = zeros(size(InputBool));  % plays as external input drive
         
         STOPPER = 0;
-        RUINER = 1/4;
+        RUINER = 1;%1/4;
         
         s(rE,1) = s_lastE + dt*(((1+tanh(V_Input(rE,1)/10))/2).*(1- STOPPER * s_lastE)/tau_R_E -s_lastE/tau_D_E);
         s(rI,1) = s_lastI + dt*(((1+tanh(V_Input(rI,1)/10))/2).*(1- STOPPER * s_lastI)/tau_R_I -s_lastI/tau_D_I);
@@ -299,6 +301,6 @@ end;
 cd data_out;
 % Save all the relevant stuff
 %octave: save('-mat7-binary', fileName, 'rate_Input','T0','dt','I0','gExc','gInh','Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites','totalComputingTime');
-save(fileName, 'rate_Input', 'rate_Output','T0','dt','I0','gExc','gInh','Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites','totalComputingTime','enableMetaplasticity','enableInhplasticity','spktimes_all','Ca_history','spikes_post','g_plas_history', 'spikes_last5sec','rate_Output5','s_history');
+save(fileName, 'rate_Input', 'rate_Output','T0','dt','I0','gExc','gInh','Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites','totalComputingTime','enableMetaplasticity','enableInhplasticity','spktimes_all','Ca_history','spikes_post','g_plas_history', 'spikes_last5sec','rate_Output5','s_history', 'syn_decay_NMDA');
 fprintf('Successfully wrote output to %s\n', fileName);
 cd ..;
