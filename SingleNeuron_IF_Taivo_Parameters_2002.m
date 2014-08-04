@@ -8,7 +8,7 @@ gNa = 100;                      % Maximal conductivity Na channel
 ENa = 50;                       % Reversal Na channel
 gK = 80;                        % Maximal conductivity K channel
 EK = -100;                      % Reversal K channel
-gL = 0.1;                       % Maximal conductivity leak channel
+gL = 0.1;                       % original 0.1 Maximal conductivity leak channel
 ERest = -67;                    % Reversal leak channel
 
 %% Spiking and basal drive
@@ -23,7 +23,7 @@ V_reset = -90;                  % Voltage a neuron resets to after spiking
 % R - rising time, D - decaying time
 % E - excitatory, I - inhibitory
 tau_R_E = 0.2;                    
-tau_D_E = 2;
+tau_D_E = 2;    % original 2
 tau_R_I = 0.5;
 tau_D_I = 10;
 
@@ -31,7 +31,7 @@ syn_E = 0;                      % Reversal potential of excitatory synapses
 syn_I = -80;                    % Reversal potential of inhibitory synapses
 
 % Synaptic conductivities
-g_PP = 0.017;                    % Maximal synaptic conductivity (AMPA) on pyramidal neurons
+g_PP = 0.017;                    % original 0.017 Maximal synaptic conductivity (AMPA) on pyramidal neurons
 g_IP = 0.1;                     % Maximal synaptic conductivity (GABA) on pyramidal neurons
 % Inhibitory conductivity (g_IP) should range in 2x...20x excitatory conductivity (g_PP)
 
@@ -67,5 +67,5 @@ learn_curve.beta2 = 80;		   % #AR80
 
 %% Various
 
-syn_decay_NMDA = 5e-3;         % #2004! Lambda penalty for having a too large weight; 1/lambda = max weight
+syn_decay_NMDA = 0.5;         % #UN 2004! Lambda penalty for having a too large weight; 1/lambda = max weight
 stab.gt = 0.5 * 1/500;		   % #AR0.5*1/500 Starting value for g_NMDA. Is already multiplied with P0 (which is 0.5). Was 4.5e-3 previously.

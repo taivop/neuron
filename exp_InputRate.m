@@ -1,5 +1,5 @@
-inputFreqs = 1:4:41;
-inputFreqs = [inputFreqs];
+inputFreqs = 0:1:20;
+%inputFreqs = [inputFreqs];
 meanWeights = [];
 outputFreqs = [];
 

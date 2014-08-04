@@ -19,7 +19,7 @@ enableInhplasticity = 0;        % enable inhibitory plasticity?
 oneInput = 1;                   % enable input from only 1 synapse?
 accelerate = 0;                 % accelerate two parameters 100x?
 
-I0 = 0.15;                       % Basal drive to pyramidal neurons (controls basal rate; 1.5 -> gamma freq (about 40-50 Hz) when isolated)
+I0 = 0.0;                       % Basal drive to pyramidal neurons (controls basal rate; 1.5 -> gamma freq (about 40-50 Hz) when isolated)
 fprintf('I0 = %.2f\n', I0);
 
 % Input trains and # of dendrites
@@ -101,7 +101,7 @@ for t=1: Tsim                       % Loop over time
     
     %TODO CHANGE: if (mod(t,    20000)==1)
     if (mod(t,10000)==1)
-        fprintf('t = %5dms\n',largebin * 1000 + t_inner);
+        fprintf('t = %5dms, mean exc weight %.2f\n',largebin * 1000 + t_inner, mean(g_plas(rE)));
         g_plas_history = [g_plas_history g_plas];
         
         
@@ -245,7 +245,6 @@ for t=1: Tsim                       % Loop over time
           % Ca and synaptic weight dynamics
           
           Ca = Ca + dt*(I_NMDA - Ca/Ca_tau);
-          
           g_plas = g_plas + dt*(eta_val.*(omega-syn_decay_NMDA*g_plas));
                     
           % Synaptic stabilization aka metaplasticity
