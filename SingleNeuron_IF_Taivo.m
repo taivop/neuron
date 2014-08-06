@@ -16,7 +16,7 @@ Tsim = T0/dt;                   % num of time steps
 enableMetaplasticity = 0;       % enable metaplasticity?
 enableInhplasticity = 0;        % enable inhibitory plasticity?
 oneInput = 0;                   % enable input from only 1 synapse?
-saveCa = 1;
+saveCa = 0;
 
 I0 = 0.0;                       % Basal drive to pyramidal neurons (controls basal rate; 1.5 -> gamma freq (about 40-50 Hz) when isolated)
 fprintf('I0 = %.2f\n', I0);
@@ -138,7 +138,7 @@ for t=1: Tsim                       % Loop over time
         s = zeros(size(InputBool));  % plays as external input drive
         
         STOPPER = 0;
-        RUINER = 1;%1/2.16;
+        RUINER = 1/2.16;
         
         s(rE,1) = s_lastE + dt*(((1+tanh(V_Input(rE,1)/10))/2).*(1- STOPPER * s_lastE)/tau_R_E -s_lastE/tau_D_E);
         s(rI,1) = s_lastI + dt*(((1+tanh(V_Input(rI,1)/10))/2).*(1- STOPPER * s_lastI)/tau_R_I -s_lastI/tau_D_I);
@@ -222,7 +222,7 @@ for t=1: Tsim                       % Loop over time
          
           V_BPAP = sum(kernel_BPAP);
           V_H = ERest + V_BPAP;                              % Magnesium unblocking caused by BPAP
-          H = Mg_block(V_H);    %TODO (V-V_r) is missing here?
+          H = Mg_block(V_H) * (V - NMDA.Ca_Vrest);          %TODO (V-V_r) is missing here?
           
           % ---START former loop
           t_kernel_f_NMDA = (t - spktimes_all) .* (spktimes_all>0 & spktimes_all<t & spktimes_all>(t-val));
@@ -260,7 +260,7 @@ for t=1: Tsim                       % Loop over time
           end;
               
           if saveCa
-              Ca_history = [Ca_history Ca];
+              Ca_history = [Ca_history Ca(1)];
           end;
           
     
@@ -291,6 +291,6 @@ end;
 cd data_out;
 % Save all the relevant stuff
 %octave: save('-mat7-binary', fileName, 'rate_Input','T0','dt','I0','gExc','gInh','Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites','totalComputingTime');
-save(fileName, 'rate_Input', 'rate_Output','T0','dt','I0','gExc','gInh','Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites','totalComputingTime','enableMetaplasticity','enableInhplasticity','spktimes_all','Ca_history','spikes_post','g_plas_history', 'spikes_last5sec','rate_Output5','s_history', 'syn_decay_NMDA');
+save(fileName, 'rate_Input', 'rate_Output','T0','dt','I0','gExc','gInh','Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites','totalComputingTime','enableMetaplasticity','enableInhplasticity','spktimes_all','Ca_history','spikes_post','g_plas_history', 'spikes_last5sec','rate_Output5','s_history', 'syn_decay_NMDA', 'RUINER');
 fprintf('Successfully wrote output to %s\n', fileName);
 cd ..;
