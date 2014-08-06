@@ -1,23 +1,17 @@
-inputFreqs = 0:1:20;
-%inputFreqs = [inputFreqs];
+inputFreqs = [1:2:10 11:3:20];
 meanWeights = [];
 outputFreqs = [];
 
 initialWeight = 0.25;
-I0 = 0.15;
-T0 = 20000; % ms
-filename_base = 'inputrate_onesyn_etaconstant';
+T0 = 5000; % ms
+filename_base = 'inputrate';
 
 for inputFreq = inputFreqs
     fprintf('----- RUNNING experiment with input freq %dHz -----\n', inputFreq);
     filename_spec = sprintf('%s-%dHz', filename_base,inputFreq);
-    [g_plas, rate_Output] = SingleNeuron_IF_Taivo(T0,inputFreq,initialWeight,I0,filename_spec);
+    [g_plas, rate_Output] = SingleNeuron_IF_Taivo(T0,inputFreq,filename_spec);
     % Take into account ONLY excitatory neurons
-    if size(g_plas) ~= [1 1]
-        avg = mean(g_plas(1:100));
-    else
-        avg = g_plas;
-    end;
+    avg = mean(g_plas(rE));
     
     meanWeights = [meanWeights; avg];
     outputFreqs = [outputFreqs rate_Output];

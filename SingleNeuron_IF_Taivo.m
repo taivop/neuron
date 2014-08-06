@@ -15,8 +15,8 @@ tw = 0.5;                       % Writing time step (ms)
 Tsim = T0/dt;                   % num of time steps
 enableMetaplasticity = 0;       % enable metaplasticity?
 enableInhplasticity = 0;        % enable inhibitory plasticity?
-oneInput = 1;                   % enable input from only 1 synapse?
-accelerate = 0;                 % accelerate two parameters 100x?
+oneInput = 0;                   % enable input from only 1 synapse?
+saveCa = 1;
 
 I0 = 0.0;                       % Basal drive to pyramidal neurons (controls basal rate; 1.5 -> gamma freq (about 40-50 Hz) when isolated)
 fprintf('I0 = %.2f\n', I0);
@@ -54,12 +54,13 @@ m = aM./(aM+bM);
 h = aH./(aH+bH);
 n = aN./(aN+bN);
 
-
 initialWeight = 0.25 / syn_decay_NMDA;  % initialise weights to their stable values
+% generate randomness of +- 5%
+weight_randomness = rand(numDendrites,1) * 0.10 - 0.05;
 
 % g_plas are the coefficients we use to get conductivities from their base values.
 % They are named 'w' in the article.
-g_plas = ones(numDendrites,1) .* initialWeight;                   % Array with all synaptic weights (evolves during plasticity)
+g_plas = (ones(numDendrites,1) + weight_randomness) .* initialWeight;                   % Array with all synaptic weights (evolves during plasticity)
 if oneInput
     g_plas(2:end) = 0;
 end;
@@ -70,11 +71,6 @@ g_NMDA = stab.gt;                               % Initialize NMDA channel conduc
 Ca_history = [];
 s_history = [];
 g_plas_history = [];
-
-if accelerate
-    learn_rate_slope = learn_rate_slope * 100;
-    syn_decay_NMDA = syn_decay_NMDA * 100;
-end;
 
 % Initialisations for some loop internal variables
 oldV    = V-(V_sp_thres);
@@ -101,7 +97,6 @@ for t=1: Tsim                       % Loop over time
         t_inner = 10000;
     end;
     
-    %TODO CHANGE: if (mod(t,    20000)==1)
     if (mod(t,10000)==1)
         fprintf('t = %5dms, mean exc weight %.2f\n',largebin * 1000 + t_inner, mean(g_plas(rE)));
         g_plas_history = [g_plas_history g_plas];
@@ -143,7 +138,7 @@ for t=1: Tsim                       % Loop over time
         s = zeros(size(InputBool));  % plays as external input drive
         
         STOPPER = 0;
-        RUINER = 1;%1/4;
+        RUINER = 1;%1/2.16;
         
         s(rE,1) = s_lastE + dt*(((1+tanh(V_Input(rE,1)/10))/2).*(1- STOPPER * s_lastE)/tau_R_E -s_lastE/tau_D_E);
         s(rI,1) = s_lastI + dt*(((1+tanh(V_Input(rI,1)/10))/2).*(1- STOPPER * s_lastI)/tau_R_I -s_lastI/tau_D_I);
@@ -227,7 +222,7 @@ for t=1: Tsim                       % Loop over time
          
           V_BPAP = sum(kernel_BPAP);
           V_H = ERest + V_BPAP;                              % Magnesium unblocking caused by BPAP
-          H = Mg_block(V_H);
+          H = Mg_block(V_H);    %TODO (V-V_r) is missing here?
           
           % ---START former loop
           t_kernel_f_NMDA = (t - spktimes_all) .* (spktimes_all>0 & spktimes_all<t & spktimes_all>(t-val));
@@ -242,7 +237,7 @@ for t=1: Tsim                       % Loop over time
           
           % Learning curve and slope
           omega = learning_curve2002(learn_curve,Ca);
-          eta_val   = eta2002(Ca);
+          eta_val = eta2002(Ca);
           
           % Ca and synaptic weight dynamics
           
@@ -255,22 +250,22 @@ for t=1: Tsim                       % Loop over time
           end;
           
           if ~enableInhplasticity
-              % TODO: should inhibitory weights stay at 0.5 or 1?
+              % TODO: what should be the (unchanging) weight of inh
+              % synapses?   
             g_plas(startInh:numDendrites) = initialWeight;  % Remove plasticity from inh synapses
           end;
           
           if oneInput
               g_plas(2:end) = 0;
+          end;
+              
+          if saveCa
               Ca_history = [Ca_history Ca];
           end;
           
     
 end
 disp('Main loop done.');
-
-if oneInput
-    g_plas = g_plas(1);
-end;
 
 %% Postsynaptic spiking frequency display
 numOfSpikes = length(spikes_post);
@@ -286,14 +281,9 @@ simulationEndTime = clock;
 totalComputingTime = etime(simulationEndTime, simulationStartTime);
 fprintf('Simulation time: %dms, total computing time: %.1fs.\n', T0, totalComputingTime);
 
-% Figure 1
-%FigSpiketrainsAndVoltage(InputBool, Vmat, endExc, numDendrites-endExc, rate_Input, T0, dt, I0)
-% Figure 2
-%FigWeightHistograms(gExc,gInh,g_plas0,g_plas,rE,rI,endExc,numDendrites-endExc,rate_Input,T0,dt,I0)
-
 
 %% Write data to file
-if strcmpi(filename_spec,'default') | strcmpi(filename_spec,'')
+if strcmpi(filename_spec,'default') || strcmpi(filename_spec,'')
     fileName = sprintf('out_%s.mat', datestr(now,'yyyy-mm-dd_HH-MM-SS'));
 else
     fileName = sprintf('out_%s_%s.mat', filename_spec, datestr(now,'yyyy-mm-dd_HH-MM-SS'));

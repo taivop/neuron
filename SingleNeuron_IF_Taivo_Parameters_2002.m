@@ -67,5 +67,5 @@ learn_curve.beta2 = 80;		   % #AR80
 
 %% Various
 
-syn_decay_NMDA = 0.5;         % #UN 2004! Lambda penalty for having a too large weight; 1/lambda = max weight
+syn_decay_NMDA = 1;         % #UN 2004! Lambda penalty for having a too large weight; 1/lambda = max weight
 stab.gt = 0.5 * 1/500;		   % #AR0.5*1/500 Starting value for g_NMDA. Is already multiplied with P0 (which is 0.5). Was 4.5e-3 previously.
