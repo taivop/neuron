@@ -1,14 +1,22 @@
-inputFreqs = [27:2:33];
+inputFreqs = [1 5 10 15:5:30 40 50];
 meanWeights = [];
 outputFreqs = [];
 
 T0 = 10000; % ms
-filename_base = 'inputrate_100syn';
+filename_base = 'inputrate_100syn_ruiner10';
 
 for inputFreq = inputFreqs
     fprintf('----- RUNNING experiment with input freq %dHz -----\n', inputFreq);
     filename_spec = sprintf('%s-%dHz', filename_base,inputFreq);
-    [g_plas, rate_Output] = SingleNeuron_IF_Taivo(T0,inputFreq,filename_spec);
+    [g_plas_history, rate_Output] = SingleNeuron_IF_Taivo(T0,inputFreq,filename_spec);
+    
+    % First take average over last 5 sec
+    if(size(g_plas_history,2) <= 5)  % if less than 5 sec simulation
+        g_plas = mean(g_plas_history, 2);
+    else
+        g_plas = mean(g_plas_history(:,end-5:end), 2);
+    end;
+    
     % Take into account ONLY excitatory neurons
     if size(g_plas,1) == 120
         avg = mean(g_plas(1:100));  % 100 exc synapses
@@ -27,4 +35,5 @@ cd data_out;
 % Save all the relevant stuff
 
 save(fileName, 'inputFreqs', 'outputFreqs', 'meanWeights', 'T0', 'filename_base');
+fprintf('Successfully wrote output to %s\n', fileName);
 cd ..;

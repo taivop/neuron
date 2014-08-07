@@ -8,3 +8,5 @@ plot(inputs, outputs, ...
 
 xlabel('Mean input activity (Hz)');
 ylabel('Mean output activity (Hz)');
+
+title('Mean output activity (Hz)');

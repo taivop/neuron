@@ -35,6 +35,10 @@ g_PP = 0.017;                    % original 0.017 Maximal synaptic conductivity 
 g_IP = 0.1;                     % Maximal synaptic conductivity (GABA) on pyramidal neurons
 % Inhibitory conductivity (g_IP) should range in 2x...20x excitatory conductivity (g_PP)
 
+% Set maximal conductivities for inh and exc synapses
+gInh = g_IP;
+gExc = g_PP;
+
 %% BPAP plasticity
 
 BPAP.V_amp = 100;              % #AR100 Amplitude of BPAP in mV
@@ -66,6 +70,6 @@ learn_curve.alfa2 = 0.55;	   % #AR0.55
 learn_curve.beta2 = 80;		   % #AR80
 
 %% Various
-
+dt = 0.1;                       % Simulating Time step (ms)
 syn_decay_NMDA = 1;         % #UN 2004! Lambda penalty for having a too large weight; 1/lambda = max weight
 stab.gt = - 0.5 * 1/500;		   % #AR0.5*1/500 Starting value for g_NMDA. Is already multiplied with P0 (which is 0.5). Was 4.5e-3 previously.

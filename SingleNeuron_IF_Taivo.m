@@ -1,4 +1,4 @@
-function [g_plas, rate_Output] = SingleNeuron_IF_Taivo(T0, rate_Input, filename_spec)
+function [g_plas_history, rate_Output] = SingleNeuron_IF_Taivo(T0, rate_Input, filename_spec)
 % T0 - simulation time (in ms), MUST BE MULTIPLE OF 1000ms
 % rate_Input - average input rate to all neurons
 % filename_spec - the tag you want to add into the name of the output data file.
@@ -10,33 +10,26 @@ simulationStartTime = clock;
 SingleNeuron_IF_Taivo_Parameters_2002;
 
 %% PAR: Set simulation parameters
-dt = 0.1;                       % Simulating Time step (ms)
-tw = 0.5;                       % Writing time step (ms)
 Tsim = T0/dt;                   % num of time steps
-enableMetaplasticity = 0;       % enable metaplasticity?
-enableInhplasticity = 0;        % enable inhibitory plasticity?
-oneInput = 0;                   % enable input from only 1 synapse?
-saveCa = 0;
+enable_metaplasticity = 0;      % enable metaplasticity?
+enable_inhplasticity = 0;       % enable inhibitory plasticity?
+enable_inhdrive = 0;            % enable inhibition at all?
+enable_onlyoneinput = 0;        % take input from only 1 synapse?
 
 I0 = 0.0;                       % Basal drive to pyramidal neurons (controls basal rate; 1.5 -> gamma freq (about 40-50 Hz) when isolated)
 fprintf('I0 = %.2f\n', I0);
 fprintf('lambda = %.2f\n', syn_decay_NMDA);
 
 % Input trains and # of dendrites
-%rate_Input = 15; % Hz
 numDendrites = 120;
 endExc = 100;                    % Last excitatory synapse
-if oneInput
+if enable_onlyoneinput
     numDendrites = 2;
     endExc = 1;
 end;
 startInh = endExc + 1;          % First inhibitory synapse
 rE = 1:endExc;                  % Excitatory synapses
 rI = startInh:numDendrites;      % Inhibitory synapses
-
-% Dividing the simulation time into one-second bins
-numBins = T0 / 1000;
-
 
 %% Initializations
 V = -60.0 + 10*rand(1);             % Initial postsynaptic voltage
@@ -61,19 +54,18 @@ weight_randomness = rand(numDendrites,1) * 0.10 - 0.05;
 % g_plas are the coefficients we use to get conductivities from their base values.
 % They are named 'w' in the article.
 g_plas = (ones(numDendrites,1) + weight_randomness) .* initialWeight;                   % Array with all synaptic weights (evolves during plasticity)
-if oneInput
+if enable_onlyoneinput
     g_plas(2:end) = 0;
 end;
 g_plas0 = g_plas;                               % Save initial values for plotting later.
 Ca = zeros(numDendrites,1);                     % Array for calcium concentration in dendrites
 g_NMDA = stab.gt;                               % Initialize NMDA channel conductivity to stable point.
 
+% Initialisations to save some variables over time
 Ca_history = [];
-s_history = [];
 g_plas_history = [];
 
 % Initialisations for some loop internal variables
-oldV    = V-(V_sp_thres);
 spikes_post=[];                                 % Output spike times
 spikes_last5sec = [];
 Vmat    = zeros (1,Tsim);                       % Voltage of postsynaptic neuron
@@ -81,10 +73,6 @@ spktimes_all = [];
 
 % Time window to check in the past for release of neurotransmitter
 val=5*(NMDA.tau_f+NMDA.tau_s)/dt;
-
-% Set maximal conductivities for inh and exc synapses
-gInh = g_IP;
-gExc = g_PP;
 
 %% MAIN LOOP
 
@@ -138,7 +126,7 @@ for t=1: Tsim                       % Loop over time
         s = zeros(size(InputBool));  % plays as external input drive
         
         STOPPER = 0;
-        RUINER = 1/2.16;
+        RUINER = 10 * 1/2.16;
         
         s(rE,1) = s_lastE + dt*(((1+tanh(V_Input(rE,1)/10))/2).*(1- STOPPER * s_lastE)/tau_R_E -s_lastE/tau_D_E);
         s(rI,1) = s_lastI + dt*(((1+tanh(V_Input(rI,1)/10))/2).*(1- STOPPER * s_lastI)/tau_R_I -s_lastI/tau_D_I);
@@ -147,10 +135,6 @@ for t=1: Tsim                       % Loop over time
             s(rE,t2) = s(rE,t2-1) + dt*(((1+tanh(V_Input(rE,t2)/10))/2).*(1- STOPPER * s(rE,t2-1))/tau_R_E -s(rE,t2-1)/tau_D_E);   % neurotransmitter concentration at the synapse
             s(rI,t2) = s(rI,t2-1) + dt*(((1+tanh(V_Input(rI,t2)/10))/2).*(1- STOPPER * s(rI,t2-1))/tau_R_I -s(rI,t2-1)/tau_D_I);   % neurotransmitter concentration at the synapse
         end
-        
-        if oneInput
-            s_history = [s_history s];
-        end;
         
         %-- neurotransmitter concentrations found
     end;
@@ -169,9 +153,10 @@ for t=1: Tsim                       % Loop over time
                 % Brought gExc and gInh here for clarity
                 %fprintf('t_inner = %4dms\n',t_inner);
                 exc_drive = gExc * g_plas(rE)'*s(rE,t_inner)*RUINER; % FROM TO
-                inh_drive = gInh * g_plas(rI)'*s(rI,t_inner)*RUINER; % 
-                if oneInput
-                    inh_drive = 0;
+                inh_drive = gInh * g_plas(rI)'*s(rI,t_inner)*RUINER; %
+                
+                if ~enable_inhdrive
+                    inh_drive = zeros(size(inh_drive));
                 end;
 
                
@@ -222,7 +207,7 @@ for t=1: Tsim                       % Loop over time
          
           V_BPAP = sum(kernel_BPAP);
           V_H = ERest + V_BPAP;                              % Magnesium unblocking caused by BPAP
-          H = Mg_block(V_H) * (V - NMDA.Ca_Vrest);          %TODO (V-V_r) is missing here?
+          H = Mg_block(V_H) * (V - NMDA.Ca_Vrest);
           
           % ---START former loop
           t_kernel_f_NMDA = (t - spktimes_all) .* (spktimes_all>0 & spktimes_all<t & spktimes_all>(t-val));
@@ -245,23 +230,21 @@ for t=1: Tsim                       % Loop over time
           g_plas = g_plas + dt*(eta_val.*(omega-syn_decay_NMDA*g_plas));
                     
           % Synaptic stabilization aka metaplasticity
-          if enableMetaplasticity
+          if enable_metaplasticity
             g_NMDA = g_NMDA + dt*(-(stab.k_minus*(V_H-ERest).^2 + stab.k_plus).*g_NMDA + stab.k_plus*stab.gt);
           end;
           
-          if ~enableInhplasticity
+          if ~enable_inhplasticity
               % TODO: what should be the (unchanging) weight of inh
               % synapses?   
             g_plas(startInh:numDendrites) = initialWeight;  % Remove plasticity from inh synapses
           end;
           
-          if oneInput
+          if enable_onlyoneinput
               g_plas(2:end) = 0;
           end;
               
-          if saveCa
-              Ca_history = [Ca_history Ca(1)];
-          end;
+          Ca_history = [Ca_history Ca(1)];
           
     
 end
@@ -290,7 +273,11 @@ else
 end;
 cd data_out;
 % Save all the relevant stuff
-%octave: save('-mat7-binary', fileName, 'rate_Input','T0','dt','I0','gExc','gInh','Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites','totalComputingTime');
-save(fileName, 'rate_Input', 'rate_Output','T0','dt','I0','gExc','gInh','Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites','totalComputingTime','enableMetaplasticity','enableInhplasticity','spktimes_all','Ca_history','spikes_post','g_plas_history', 'spikes_last5sec','rate_Output5','s_history', 'syn_decay_NMDA', 'RUINER');
+save(fileName, 'rate_Input', 'rate_Output','T0','dt','I0','gExc','gInh', ...
+    'Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites', ...
+    'totalComputingTime','enable_metaplasticity','enable_inhplasticity', ...
+    'spktimes_all','Ca_history','spikes_post', 'g_plas_history', ...
+    'spikes_last5sec','rate_Output5','syn_decay_NMDA', ...
+    'RUINER', 'STOPPER', 'enable_inhdrive');
 fprintf('Successfully wrote output to %s\n', fileName);
 cd ..;
