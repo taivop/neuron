@@ -52,8 +52,8 @@ BPAP.tau_s = 25;               % #AR25 Time constant slow component (in ms)
 NMDA.Mg_con = 1;               % #AR1 Concentration of Mg
 NMDA.Ca_Vrest = 130;           % #AR130 Calcium resting potential (mV)
 % 2002 article, page 2, top right: "Unless stated otherwise, we assume an equal magnitude for the fast and slow components."
-NMDA.I_f = 0.5;                % #AR0.5 Relative magnitude fast component NMDA conductance
-NMDA.I_s = 0.5;                % #AR0.5 Relative magnitude slow component NMDA conductance
+NMDA.I_f = 0.25;                % #AR0.5 Relative magnitude fast component NMDA conductance
+NMDA.I_s = 0.75;                % #AR0.5 Relative magnitude slow component NMDA conductance
 NMDA.tau_f = 50;               % #AR50 Time constant fast component (in ms)
 NMDA.tau_s = 200;              % #AR200 Time constant slow component (in ms)
 

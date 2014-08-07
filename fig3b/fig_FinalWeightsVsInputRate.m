@@ -1,4 +1,4 @@
-function [] = fig_MeanFinalWeightVsInputRate(inputFreqs1, meanWeights1, inputFreqs2, meanWeights2, inputFreqs3, meanWeights3)
+function [] = fig_FinalWeightsVsInputRate(inputFreqs1, meanWeights1, inputFreqs2, meanWeights2, inputFreqs3, meanWeights3)
 
 
 figure();
@@ -16,4 +16,4 @@ fprintf('input 1 - black, input 2 - red, input 3 - blue\n');
 xlabel('Mean input activity (Hz)');
 ylabel('Mean final weight');
 
-title('Mean final weight');
+title('Fig. 3B: mean final weight curve for different EPSP amplitudes');

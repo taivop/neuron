@@ -1,9 +1,9 @@
-inputFreqs = [1 5 10 15:5:30 40 50];
+inputFreqs = [1:2:10 15:5:30];
 meanWeights = [];
 outputFreqs = [];
 
 T0 = 10000; % ms
-filename_base = 'inputrate_100syn_ruiner10';
+filename_base = 'inputrate_100syn_ruiner10_If025';
 
 for inputFreq = inputFreqs
     fprintf('----- RUNNING experiment with input freq %dHz -----\n', inputFreq);
