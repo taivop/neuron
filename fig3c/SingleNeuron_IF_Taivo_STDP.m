@@ -1,6 +1,6 @@
-function [g_plas_history, rate_Output] = SingleNeuron_IF_Taivo(T0, rate_Input, filename_spec)
-% T0 - simulation time (in ms), MUST BE MULTIPLE OF 1000ms
-% rate_Input - average input rate to all neurons
+function [g_plas_history, rate_Output] = SingleNeuron_IF_Taivo_STDP(T0, deltaT, filename_spec)
+% T0 - total simulation time
+% deltaT = postsyn_spike_time - presyn_spike_time
 % filename_spec - the tag you want to add into the name of the output data file.
 
 %% Script initialization
@@ -22,15 +22,11 @@ fprintf('I0 = %.2f\n', I0);
 fprintf('lambda = %.2f\n', syn_decay_NMDA);
 
 % Input trains and # of dendrites
-numDendrites = 120;
-endExc = 100;                    % Last excitatory synapse
-if enable_onlyoneinput
-    numDendrites = 2;
-    endExc = 1;
-end;
+numDendrites = 2;
+endExc = 1;
 startInh = endExc + 1;          % First inhibitory synapse
 rE = 1:endExc;                  % Excitatory synapses
-rI = startInh:numDendrites;      % Inhibitory synapses
+rI = startInh:numDendrites;     % Inhibitory synapses
 
 %% Initializations
 V = -60.0 + 10*rand(1);             % Initial postsynaptic voltage
@@ -65,6 +61,9 @@ g_NMDA = stab.gt;                               % Initialize NMDA channel conduc
 % Initialisations to save some variables over time
 Ca_history = [];
 g_plas_history = [];
+H_history = [];
+I_NMDA_history = [];
+f_history = [];
 
 % Initialisations for some loop internal variables
 spikes_post=[];                                 % Output spike times
@@ -94,8 +93,8 @@ for t=1: Tsim                       % Loop over time
         % Generate input spikes
         desiredCorrelation = 0; % desired correlation for input to excitatory synapses
 
-        [spikes_binary, spiketimes] = GenerateInputSpikes(endExc, rate_Input, desiredCorrelation, 1000, dt, 0);
-        [spikes_binary2, spiketimes2] = GenerateInputSpikes(numDendrites-endExc, rate_Input, 0, 1000, dt, 0);
+        [spikes_binary, spiketimes] = GenerateInputSpikes_STDP(-deltaT);
+        [spikes_binary2, spiketimes2] = GenerateEmptyInput;
 
         InputBool = [spikes_binary;spikes_binary2];
         spktimes =  zeros(numDendrites,max(size(spiketimes,2),size(spiketimes2,2)));
@@ -162,8 +161,10 @@ for t=1: Tsim                       % Loop over time
 
                
                 %%% Spike detection and temporary storage  &&&&&&&&&&&&&&&&&&&&
+                
+                % MAKE ARTIFICIAL POSTSYNAPTIC SPIKE
         
-                if (V>V_sp_thres)
+                if (V>V_sp_thres || mod(t,10000) == 5000)  % ALWAYS SPIKE AT 500ms
                     if (V==V_spike)
                         V = V_reset;
                         
@@ -175,9 +176,6 @@ for t=1: Tsim                       % Loop over time
                     else
                         V = V_spike;
                         spikes_post = [spikes_post t];
-                        if (Tsim-t) / 10000 <= 5
-                            spikes_last5sec = [spikes_last5sec t];
-                        end;
                     end
                 else
                  % cell dynamics
@@ -201,14 +199,13 @@ for t=1: Tsim                       % Loop over time
           %%% Plasticity  &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
           
           % Only look at recent spikes
-          % Might be inefficient; possibly keep track of the first spike in the past that might interest us
-          %TODO look here
           t_kernel =  t - spikes_post(spikes_post>(t-(5*(BPAP.tau_f+BPAP.tau_s)/dt)));
           kernel_BPAP = BPAP.V_amp*(BPAP.I_f*exp(-t_kernel./BPAP.tau_f)+BPAP.I_s*exp(-t_kernel/BPAP.tau_s));
-         
           V_BPAP = sum(kernel_BPAP);
           V_H = ERest + V_BPAP;                              % Magnesium unblocking caused by BPAP
           H = Mg_block(V_H) * (V - NMDA.Ca_Vrest);
+          Mg_block(V_H); % does vary, so this is good
+          %H_history = [H_history H];
           
           % ---START former loop
           t_kernel_f_NMDA = (t - spktimes_all) .* (spktimes_all>0 & spktimes_all<t & spktimes_all>(t-val));
@@ -218,6 +215,8 @@ for t=1: Tsim                       % Loop over time
           taus(taus==0) = -Inf;
           f = sum(NMDA.I_f*exp(tauf)+NMDA.I_s*exp(taus),2);
           I_NMDA = (g_NMDA*f*H);
+          %f_history = [f_history f(1)];
+          %I_NMDA_history = [I_NMDA_history I_NMDA(1)];
           % ---END former loop
           %fprintf('size of vectorised I_NMDA is %dx%d\n',size(I_NMDA,1),size(I_NMDA,2));
           
@@ -253,12 +252,8 @@ disp('Main loop done.');
 
 %% Postsynaptic spiking frequency display
 numOfSpikes = length(spikes_post);
-fprintf('Input frequency : %.0fHz\n', rate_Input);
 rate_Output = numOfSpikes/(T0/1000);
 fprintf('Output frequency: %.0fHz\n', rate_Output);
-time = min(T0,5000);
-rate_Output5 = length(spikes_last5sec)/(time/1000);
-fprintf('Output frequency (last 5 seconds): %.0fHz\n', rate_Output5);
 
 %% Computation time display
 simulationEndTime = clock;
@@ -274,11 +269,12 @@ else
 end;
 cd data_out;
 % Save all the relevant stuff
-save(fileName, 'rate_Input', 'rate_Output','T0','dt','I0','gExc','gInh', ...
+save(fileName, 'rate_Output','T0','dt','I0','gExc','gInh', ...
     'Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites', ...
     'totalComputingTime','enable_metaplasticity','enable_inhplasticity', ...
     'spktimes_all','Ca_history','spikes_post', 'g_plas_history', ...
-    'spikes_last5sec','rate_Output5','syn_decay_NMDA', ...
-    'RUINER', 'STOPPER', 'enable_inhdrive', 'EPSP_amplitude');
+    'spikes_last5sec','syn_decay_NMDA', 'RUINER', 'STOPPER', ...
+    'enable_inhdrive', 'EPSP_amplitude', 'H_history', 'I_NMDA_history', ...
+    'f_history', 'deltaT');
 fprintf('Successfully wrote output to %s\n', fileName);
 cd ..;
