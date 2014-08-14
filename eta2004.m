@@ -1,3 +1,3 @@
-function [eta_val] = eta2004(Ca, learn_rate_slope)
+function [eta_val] = eta2004(Ca, eta_slope)
 
-eta_val = learn_rate_slope .* Ca;
+eta_val = eta_slope .* Ca;

@@ -63,7 +63,7 @@ Ca_history = [];
 g_plas_history = [];
 H_history = [];
 I_NMDA_history = [];
-f_history = [];
+fg_history = [];
 
 % Initialisations for some loop internal variables
 spikes_post=[];                                 % Output spike times
@@ -205,7 +205,7 @@ for t=1: Tsim                       % Loop over time
           V_H = ERest + V_BPAP;                              % Magnesium unblocking caused by BPAP
           H = Mg_block(V_H) * (V - NMDA.Ca_Vrest);
           Mg_block(V_H); % does vary, so this is good
-          %H_history = [H_history H];
+          H_history = [H_history H];
           
           % ---START former loop
           t_kernel_f_NMDA = (t - spktimes_all) .* (spktimes_all>0 & spktimes_all<t & spktimes_all>(t-val));
@@ -214,8 +214,8 @@ for t=1: Tsim                       % Loop over time
           tauf(tauf==0) = -Inf;
           taus(taus==0) = -Inf;
           f = sum(NMDA.I_f*exp(tauf)+NMDA.I_s*exp(taus),2);
-          I_NMDA = (g_NMDA*f*H);
-          %f_history = [f_history f(1)];
+          I_NMDA = g_NMDA*f*H;
+          fg_history = [fg_history g_NMDA*f(1)];
           %I_NMDA_history = [I_NMDA_history I_NMDA(1)];
           % ---END former loop
           %fprintf('size of vectorised I_NMDA is %dx%d\n',size(I_NMDA,1),size(I_NMDA,2));
@@ -275,6 +275,6 @@ save(fileName, 'rate_Output','T0','dt','I0','gExc','gInh', ...
     'spktimes_all','Ca_history','spikes_post', 'g_plas_history', ...
     'spikes_last5sec','syn_decay_NMDA', 'RUINER', 'STOPPER', ...
     'enable_inhdrive', 'EPSP_amplitude', 'H_history', 'I_NMDA_history', ...
-    'f_history', 'deltaT');
+    'fg_history', 'deltaT');
 fprintf('Successfully wrote output to %s\n', fileName);
 cd ..;

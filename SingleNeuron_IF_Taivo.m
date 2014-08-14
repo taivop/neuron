@@ -15,6 +15,7 @@ enable_metaplasticity = 0;      % enable metaplasticity?
 enable_inhplasticity = 0;       % enable inhibitory plasticity?
 enable_inhdrive = 0;            % enable inhibition at all?
 enable_onlyoneinput = 1;        % take input from only 1 synapse?
+enable_100x_speedup = 0;        % should we speed up the simulation?
 
 I0 = 0.0;                       % Basal drive to pyramidal neurons (controls basal rate; 1.5 -> gamma freq (about 40-50 Hz) when isolated)
 EPSP_amplitude = 1;             % in mV, rough value
@@ -28,6 +29,11 @@ if enable_onlyoneinput
     numDendrites = 2;
     endExc = 1;
 end;
+if enable_100x_speedup
+    eta_slope = eta_slope * 100;
+    syn_decay_NMDA = syn_decay_NMDA * 100;
+end;
+
 startInh = endExc + 1;          % First inhibitory synapse
 rE = 1:endExc;                  % Excitatory synapses
 rI = startInh:numDendrites;      % Inhibitory synapses

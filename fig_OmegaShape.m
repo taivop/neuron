@@ -7,7 +7,7 @@ omegas = [];
 % learn_curve.alfa2 = 0.55;
 % learn_curve.beta2 = 80;
 
-SingleNeuron_IF_Taivo_Parameters_2002;
+SingleNeuron_IF_Taivo_Parameters_2004;
 
 for Ca = calciums
     omega = learning_curve2002(learn_curve,Ca);
