@@ -85,7 +85,7 @@ for t=1: Tsim                       % Loop over time
         t_inner = 10000;
     end;
     
-    g_plas_history = [g_plas_history g_plas(1)];
+    %g_plas_history = [g_plas_history g_plas(1)];
     
     if (mod(t,10000)==1)
         fprintf('t = %5dms, mean exc weight %.2f\n',largebin * 1000 + t_inner, mean(g_plas(rE)));
@@ -245,7 +245,7 @@ for t=1: Tsim                       % Loop over time
               g_plas(2:end) = 0;
           end;
               
-          Ca_history = [Ca_history Ca(1)];
+          %Ca_history = [Ca_history Ca(1)];
           
     
 end
