@@ -61,7 +61,7 @@ g_NMDA = stab.gt;                               % Initialize NMDA channel conduc
 % Initialisations to save some variables over time
 Ca_history = [];
 g_plas_history = [];
-H_history = [];
+V_H_history = [];
 I_NMDA_history = [];
 fg_history = [];
 
@@ -85,9 +85,10 @@ for t=1: Tsim                       % Loop over time
         t_inner = 10000;
     end;
     
+    g_plas_history = [g_plas_history g_plas(1)];
+    
     if (mod(t,10000)==1)
         fprintf('t = %5dms, mean exc weight %.2f\n',largebin * 1000 + t_inner, mean(g_plas(rE)));
-        g_plas_history = [g_plas_history g_plas];
         
         
         % Generate input spikes
@@ -200,22 +201,22 @@ for t=1: Tsim                       % Loop over time
           
           % Only look at recent spikes
           t_kernel =  t - spikes_post(spikes_post>(t-(5*(BPAP.tau_f+BPAP.tau_s)/dt)));
-          kernel_BPAP = BPAP.V_amp*(BPAP.I_f*exp(-t_kernel./BPAP.tau_f)+BPAP.I_s*exp(-t_kernel/BPAP.tau_s));
+          kernel_BPAP = BPAP.V_amp*(BPAP.I_f*exp(-t_kernel./(BPAP.tau_f/dt))+BPAP.I_s*exp(-t_kernel/(BPAP.tau_s/dt)));
           V_BPAP = sum(kernel_BPAP);
           V_H = ERest + V_BPAP;                              % Magnesium unblocking caused by BPAP
           H = Mg_block(V_H) * (V - NMDA.Ca_Vrest);
-          Mg_block(V_H); % does vary, so this is good
-          H_history = [H_history H];
+          Mg_block(V_H);
+          %V_H_history = [V_H_history V_H];
           
           % ---START former loop
           t_kernel_f_NMDA = (t - spktimes_all) .* (spktimes_all>0 & spktimes_all<t & spktimes_all>(t-val));
-          tauf = -t_kernel_f_NMDA./NMDA.tau_f;
-          taus = -t_kernel_f_NMDA./NMDA.tau_s;
+          tauf = -t_kernel_f_NMDA./(NMDA.tau_f / dt);
+          taus = -t_kernel_f_NMDA./(NMDA.tau_s / dt);
           tauf(tauf==0) = -Inf;
           taus(taus==0) = -Inf;
           f = sum(NMDA.I_f*exp(tauf)+NMDA.I_s*exp(taus),2);
           I_NMDA = g_NMDA*f*H;
-          fg_history = [fg_history g_NMDA*f(1)];
+          %fg_history = [fg_history 0.5*f(1)];
           %I_NMDA_history = [I_NMDA_history I_NMDA(1)];
           % ---END former loop
           %fprintf('size of vectorised I_NMDA is %dx%d\n',size(I_NMDA,1),size(I_NMDA,2));
@@ -228,7 +229,7 @@ for t=1: Tsim                       % Loop over time
           
           Ca = Ca + dt*(I_NMDA - Ca/Ca_tau);
           g_plas = g_plas + dt*(eta_val.*(omega-syn_decay_NMDA*g_plas));
-                    
+                              
           % Synaptic stabilization aka metaplasticity
           if enable_metaplasticity
             g_NMDA = g_NMDA + dt*(-(stab.k_minus*(V_H-ERest).^2 + stab.k_plus).*g_NMDA + stab.k_plus*stab.gt);
@@ -274,7 +275,7 @@ save(fileName, 'rate_Output','T0','dt','I0','gExc','gInh', ...
     'totalComputingTime','enable_metaplasticity','enable_inhplasticity', ...
     'spktimes_all','Ca_history','spikes_post', 'g_plas_history', ...
     'spikes_last5sec','syn_decay_NMDA', 'RUINER', 'STOPPER', ...
-    'enable_inhdrive', 'EPSP_amplitude', 'H_history', 'I_NMDA_history', ...
+    'enable_inhdrive', 'EPSP_amplitude', 'V_H_history', 'I_NMDA_history', ...
     'fg_history', 'deltaT');
 fprintf('Successfully wrote output to %s\n', fileName);
 cd ..;
