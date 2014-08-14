@@ -1,22 +1,21 @@
 #!/bin/bash
 
-cd ..
+cd ../fig3c
 
 # Take one node
 #SBATCH -N 1
 
 # Take some CPUs
-#SBATCH -c 1
+#SBATCH -c 2
 
 # Take some memory
-#SBATCH --mem=4096
+#SBATCH --mem=16000
 
 # Set walltime
-#SBATCH -t 00:10:00
+#SBATCH -t 01:00:00
 
 # Set queue
-#SBATCH -p main
+#SBATCH -p testing
 
-srun /storage/software/MATLAB_R2013b/bin/matlab -nodisplay -nosplash -nojvm -r "SingleNeuron_IF_Taivo(2000, 10, 1, 'cluster_dummy')"
+srun /storage/software/MATLAB_R2013b/bin/matlab -nodisplay -nosplash -nojvm -r "exp_STDP"
 
-exit
