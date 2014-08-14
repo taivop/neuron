@@ -223,7 +223,7 @@ for t=1: Tsim                       % Loop over time
           
           % Learning curve and slope
           omega = learning_curve2002(learn_curve,Ca);
-          eta_val = eta2002(Ca);
+          eta_val = eta2002(Ca) / 100;
           
           % Ca and synaptic weight dynamics
           
