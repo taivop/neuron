@@ -1,5 +1,5 @@
 filename_base = 'STDP';
-T0 = 1000;
+T0 = 100000;
 
 % "Pairs of presynaptic and postsynaptic stimuli were repeated 100 times at 1 Hz"
 % deltaT is t_post - t_pre
