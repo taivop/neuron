@@ -24,7 +24,7 @@ cd ../../fig3c
 
 for DELTAT in -13 37
 do
-	MATLAB_COMMAND="STDP_SingleRun("$DELTAT", 1, '"$FILENAME_BASE"')"
+	MATLAB_COMMAND="STDP_SingleRun("$DELTAT", '"$FILENAME_BASE"')"
 	srun /storage/software/MATLAB_R2013b/bin/matlab -nodisplay -nosplash -nojvm -r $MATLAB_COMMAND
 done
 
