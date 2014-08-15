@@ -2,13 +2,13 @@ inputFreqs = [1:2:10 15:5:30];
 meanWeights = [];
 outputFreqs = [];
 
-T0 = 10000; % ms
+T_sec = 10; % seconds
 filename_base = 'inputrate_100syn_ruiner10_If025';
 
 for inputFreq = inputFreqs
     fprintf('----- RUNNING experiment with input freq %dHz -----\n', inputFreq);
     filename_spec = sprintf('%s-%dHz', filename_base,inputFreq);
-    [g_plas_history, rate_Output] = SingleNeuron_IF_Taivo(T0,inputFreq,filename_spec);
+    [g_plas_history, rate_Output] = SingleNeuron_IF_Taivo(T_sec,inputFreq,filename_spec);
     
     % First take average over last 5 sec
     if(size(g_plas_history,2) <= 5)  % if less than 5 sec simulation

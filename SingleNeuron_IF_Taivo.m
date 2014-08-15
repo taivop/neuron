@@ -1,5 +1,5 @@
-function [g_plas_history, rate_Output] = SingleNeuron_IF_Taivo(T0, rate_Input, filename_spec)
-% T0 - simulation time (in ms), MUST BE MULTIPLE OF 1000ms
+function [g_plas_history, rate_Output] = SingleNeuron_IF_Taivo(T_sec, rate_Input, filename_spec)
+% T_sec - simulation time (in seconds), MUST BE INTEGER NUMBER OF SECONDS
 % rate_Input - average input rate to all neurons
 % filename_spec - the tag you want to add into the name of the output data file.
 
@@ -10,6 +10,7 @@ simulationStartTime = clock;
 SingleNeuron_IF_Taivo_Parameters_2002;
 
 %% PAR: Set simulation parameters
+T0 = T_sec * 1000;
 Tsim = T0/dt;                   % num of time steps
 enable_metaplasticity = 0;      % enable metaplasticity?
 enable_inhplasticity = 0;       % enable inhibitory plasticity?

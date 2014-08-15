@@ -1,5 +1,5 @@
 filename_base = 'STDP';
-T0 = 100000;
+T_sec = 100;
 
 % "Pairs of presynaptic and postsynaptic stimuli were repeated 100 times at 1 Hz"
 % deltaT is t_post - t_pre
@@ -11,7 +11,7 @@ for deltaT = deltaTvalues
     fprintf('----- RUNNING experiment with deltaT = %dms -----\n', deltaT);
     filename_spec = sprintf('%s_%dms', filename_base,deltaT);
     
-    [g_plas_history, rate_Output] = SingleNeuron_IF_Taivo_STDP(T0, deltaT, filename_spec);
+    [g_plas_history, rate_Output] = SingleNeuron_IF_Taivo_STDP(T_sec, deltaT, filename_spec);
     
     % First take average over last 5 sec
     if(size(g_plas_history,2) <= 5)  % if less than 5 sec simulation
