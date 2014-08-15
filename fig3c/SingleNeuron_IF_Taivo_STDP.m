@@ -19,6 +19,7 @@ enable_onlyoneinput = 1;        % take input from only 1 synapse?
 
 I0 = 0.0;                       % Basal drive to pyramidal neurons (controls basal rate; 1.5 -> gamma freq (about 40-50 Hz) when isolated)
 EPSP_amplitude = 1;             % in mV, rough value
+fprintf('Simulation time: %ds\n', T_sec);
 fprintf('I0 = %.2f\n', I0);
 fprintf('lambda = %.2f\n', syn_decay_NMDA);
 
@@ -260,7 +261,7 @@ fprintf('Output frequency: %.0fHz\n', rate_Output);
 %% Computation time display
 simulationEndTime = clock;
 totalComputingTime = etime(simulationEndTime, simulationStartTime);
-fprintf('Simulation time: %dms, total computing time: %.1fs.\n', T0, totalComputingTime);
+fprintf('Simulation time: %ds, total computing time: %.1fs.\n', T_sec, totalComputingTime);
 
 
 %% Write data to file
