@@ -210,7 +210,7 @@ for t=1: Tsim                       % Loop over time
           % Might be inefficient; possibly keep track of the first spike in the past that might interest us
           %TODO look here
           t_kernel =  t - spikes_post(spikes_post>(t-(5*(BPAP.tau_f+BPAP.tau_s)/dt)));
-          kernel_BPAP = BPAP.V_amp*(BPAP.I_f*exp(-t_kernel./BPAP.tau_f)+BPAP.I_s*exp(-t_kernel/BPAP.tau_s));
+          kernel_BPAP = BPAP.V_amp*(BPAP.I_f*exp(-t_kernel./(BPAP.tau_f/dt))+BPAP.I_s*exp(-t_kernel/(BPAP.tau_s/dt)));
          
           V_BPAP = sum(kernel_BPAP);
           V_H = ERest + V_BPAP;                              % Magnesium unblocking caused by BPAP
@@ -218,8 +218,8 @@ for t=1: Tsim                       % Loop over time
           
           % ---START former loop
           t_kernel_f_NMDA = (t - spktimes_all) .* (spktimes_all>0 & spktimes_all<t & spktimes_all>(t-val));
-          tauf = -t_kernel_f_NMDA./NMDA.tau_f;
-          taus = -t_kernel_f_NMDA./NMDA.tau_s;
+          tauf = -t_kernel_f_NMDA./(NMDA.tau_f / dt);
+          taus = -t_kernel_f_NMDA./(NMDA.tau_s / dt);
           tauf(tauf==0) = -Inf;
           taus(taus==0) = -Inf;
           f = sum(NMDA.I_f*exp(tauf)+NMDA.I_s*exp(taus),2);
