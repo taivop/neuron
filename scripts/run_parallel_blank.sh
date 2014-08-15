@@ -5,7 +5,7 @@ TIMESTAMP=$(date +%s)
 FILENAME_BASE='out_parallel_'$TIMESTAMP
 
 # go to script folder
-cd ..
+cd ../../fig3c
 
 # Take one node
 #SBATCH -N 1
@@ -24,7 +24,7 @@ cd ..
 
 for DELTAT in -13 37
 do
-	MATLAB_COMMAND="STDP_SingleRun(2000, "$DELTAT", 1, '"$FILENAME_BASE"')"
+	MATLAB_COMMAND="STDP_SingleRun("$DELTAT", 1, '"$FILENAME_BASE"')"
 	srun /storage/software/MATLAB_R2013b/bin/matlab -nodisplay -nosplash -nojvm -r $MATLAB_COMMAND
 done
 

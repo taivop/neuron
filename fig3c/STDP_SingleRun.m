@@ -1,5 +1,5 @@
 function [] = STDP_SingleRun(deltaT, filename_base)
-T_sec = 100;    % run for how many seconds?
+T_sec = 1;    % run for how many seconds?
 
 fprintf('----- RUNNING experiment with deltaT = %dms -----\n', deltaT);
 filename_spec = sprintf('%s_%dms', filename_base,deltaT);
