@@ -263,6 +263,17 @@ simulationEndTime = clock;
 totalComputingTime = etime(simulationEndTime, simulationStartTime);
 fprintf('Simulation time: %ds, total computing time: %.1fs.\n', T_sec, totalComputingTime);
 
+%% Mean final weight calculation
+% First take average over last 5 sec
+if(size(g_plas_history,2) <= 5)  % if less than 5 sec simulation
+    g_plas_avgd = mean(g_plas_history, 2);
+else
+    g_plas_avgd = mean(g_plas_history(:,end-5:end), 2);
+end;
+
+% Take into account only the excitatory synapse
+mean_final_weight = g_plas_avgd(1);
+
 
 %% Write data to file
 if strcmpi(filename_spec,'default') || strcmpi(filename_spec,'')
@@ -278,6 +289,6 @@ save(fileName, 'rate_Output','T0','dt','I0','gExc','gInh', ...
     'spktimes_all','Ca_history','spikes_post', 'g_plas_history', ...
     'spikes_last5sec','syn_decay_NMDA', 'RUINER', 'STOPPER', ...
     'enable_inhdrive', 'EPSP_amplitude', 'V_H_history', 'I_NMDA_history', ...
-    'fg_history', 'deltaT');
+    'fg_history', 'deltaT', 'mean_final_weight');
 fprintf('Successfully wrote output to %s\n', fileName);
 cd ..;
