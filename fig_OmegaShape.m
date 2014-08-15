@@ -15,4 +15,13 @@ for Ca = calciums
 end;
 
 figure();
+plot([0 1], [0.25 0.25], 'k--');
+hold on;
 plot(calciums,omegas,'r-');
+
+title('\Omega')
+xlabel('Ca^{2+} (\muM)')
+ylabel('\Omega')
+
+xlim([0 1])
+ylim([-0.2 1.2])

@@ -12,3 +12,9 @@ end;
 
 figure();
 plot(calciums,etas,'r-');
+
+title('\eta');
+xlabel('Ca^{2+} (\muM)');
+ylabel('\eta (sec^{-1})');
+xlim([0 1])
+ylim([-0.2 1.2])
