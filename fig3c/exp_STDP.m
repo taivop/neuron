@@ -33,6 +33,6 @@ fileName = sprintf('res_STDP_%s.mat', datestr(now,'yyyy-mm-dd_HH-MM-SS'));
 cd data_out;
 % Save all the relevant stuff
 
-save(fileName, 'deltaTvalues', 'meanWeights', 'outputFreqs', 'T0', 'filename_base');
+save(fileName, 'deltaTvalues', 'meanWeights', 'outputFreqs', 'T_sec', 'filename_base');
 fprintf('Successfully wrote output to %s\n', fileName);
 cd ..;
