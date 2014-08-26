@@ -6,28 +6,33 @@ function [g_plas_history, rate_Output] = SingleNeuron_IF_Taivo(T_sec, rate_Input
 %% Script initialization
 simulationStartTime = clock;
 
-% Load parameters
-SingleNeuron_IF_Taivo_Parameters_2002;
-
 %% PAR: Set simulation parameters
-T0 = T_sec * 1000;
-Tsim = T0/dt;                   % num of time steps
 enable_metaplasticity = 0;      % enable metaplasticity?
 enable_inhplasticity = 0;       % enable inhibitory plasticity?
 enable_inhdrive = 0;            % enable inhibition at all?
 enable_onlyoneinput = 1;        % take input from only 1 synapse?
-enable_100x_speedup = 0;        % should we speed up the simulation?
+enable_100x_speedup = 0;        % should we speed up the simulation? (WORKS ONLY IF WE ARE USING 2004 ETA!)
+enable_2004 = 1;                % are we running 2004 simulations?
 
+% Load parameters
+if enable_2004
+    SingleNeuron_IF_Taivo_Parameters_2004;
+else
+    SingleNeuron_IF_Taivo_Parameters_2002;
+end;
+
+T0 = T_sec * 1000;              % Simulation length in ms
+Tsim = T0/dt;                   % num of time steps
 I0 = 0.0;                       % Basal drive to pyramidal neurons (controls basal rate; 1.5 -> gamma freq (about 40-50 Hz) when isolated)
 EPSP_amplitude = 1;             % in mV, rough value
 fprintf('Simulation time: %ds\n', T_sec);
-fprintf('I0 = %.2f\n', I0);
+%fprintf('I0 = %.2f\n', I0);
 fprintf('lambda = %.2f\n', syn_decay_NMDA);
 
 % Input trains and # of dendrites
 numDendrites = 120;
 endExc = 100;                    % Last excitatory synapse
-if enable_onlyoneinput
+if enable_onlyoneinput && ~enable_2004 % don't run one-input simulations in 2004 mode
     numDendrites = 2;
     endExc = 1;
 end;
@@ -230,8 +235,13 @@ for t=1: Tsim                       % Loop over time
           %fprintf('size of vectorised I_NMDA is %dx%d\n',size(I_NMDA,1),size(I_NMDA,2));
           
           % Learning curve and slope
-          omega = learning_curve2002(learn_curve,Ca);
-          eta_val = eta2002(Ca);
+          if enable_2004
+            omega = learning_curve2004(learn_curve,Ca);
+            eta_val = eta2004(Ca,eta_slope);
+          else
+            omega = learning_curve2002(learn_curve,Ca);
+            eta_val = eta2002(Ca,eta_slope);
+          end;
           
           % Ca and synaptic weight dynamics
           
