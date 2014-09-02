@@ -31,8 +31,8 @@ syn_E = 0;                      % Reversal potential of excitatory synapses
 syn_I = -80;                    % Reversal potential of inhibitory synapses
 
 % Synaptic conductivities
-g_PP = 0.017;                    % original 0.017 Maximal synaptic conductivity (AMPA) on pyramidal neurons
-g_IP = 0.1;                     % Maximal synaptic conductivity (GABA) on pyramidal neurons
+g_PP = 0.017;                   %#AR0.03 Maximal synaptic conductivity (AMPA) on pyramidal neurons
+g_IP = 0.1;                     %#AR0.1 Maximal synaptic conductivity (GABA) on pyramidal neurons
 % Inhibitory conductivity (g_IP) should range in 2x...20x excitatory conductivity (g_PP)
 
 % Set maximal conductivities for inh and exc synapses

@@ -10,8 +10,8 @@ simulationStartTime = clock;
 enable_metaplasticity = 0;      % enable metaplasticity?
 enable_inhplasticity = 0;       % enable inhibitory plasticity?
 enable_inhdrive = 0;            % enable inhibition at all?
-enable_onlyoneinput = 1;        % take input from only 1 synapse?
-enable_100x_speedup = 0;        % should we speed up the simulation? (WORKS ONLY IF WE ARE USING 2004 ETA!)
+enable_onlyoneinput = 0;        % take input from only 1 synapse?
+enable_100x_speedup = 1;        % should we speed up the simulation? (WORKS ONLY IF WE ARE USING 2004 ETA!)
 enable_2004 = 1;                % are we running 2004 simulations?
 
 % Load parameters
