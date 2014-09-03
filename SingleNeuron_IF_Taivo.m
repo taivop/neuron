@@ -10,9 +10,9 @@ simulationStartTime = clock;
 enable_metaplasticity = 0;      % enable metaplasticity?
 enable_inhplasticity = 0;       % enable inhibitory plasticity?
 enable_inhdrive = 0;            % enable inhibition at all?
-enable_onlyoneinput = 0;        % take input from only 1 synapse?
-enable_100x_speedup = 1;        % should we speed up the simulation? (WORKS ONLY IF WE ARE USING 2004 ETA!)
-enable_2004 = 1;                % are we running 2004 simulations?
+enable_onlyoneinput = 1;        % take input from only 1 synapse?
+enable_100x_speedup = 0;        % should we speed up the simulation? (WORKS ONLY IF WE ARE USING 2004 ETA!)
+enable_2004 = 0;                % are we running 2004 simulations?
 
 % Load parameters
 if enable_2004
@@ -36,7 +36,7 @@ if enable_onlyoneinput && ~enable_2004 % don't run one-input simulations in 2004
     numDendrites = 2;
     endExc = 1;
 end;
-if enable_100x_speedup
+if enable_100x_speedup 
     eta_slope = eta_slope * 100;
     syn_decay_NMDA = syn_decay_NMDA * 100;
 end;
@@ -92,14 +92,16 @@ val=5*(NMDA.tau_f+NMDA.tau_s)/dt;
 
 disp('Running main loop...');
 %waitbar(0);
+timesteps_in_1sec = 1000 / dt;
+
 for t=1: Tsim                       % Loop over time
-    largebin = fix((t-1)/10000);     % STARTS FROM ZERO. find out which large time bin we are in
-    t_inner = mod(t,10000);          % find out where we are in the current large time bin
+    largebin = fix((t-1)/timesteps_in_1sec);     % STARTS FROM ZERO. find out which large time bin we are in
+    t_inner = mod(t,timesteps_in_1sec);          % find out where we are in the current large time bin
     if t_inner == 0
-        t_inner = 10000;
+        t_inner = timesteps_in_1sec;
     end;
     
-    if (mod(t,10000)==1)
+    if (mod(t, timesteps_in_1sec)==1)
         fprintf('t = %5dms, mean exc weight %.2f\n',largebin * 1000 + t_inner, mean(g_plas(rE)));
         g_plas_history = [g_plas_history g_plas];
         
@@ -121,8 +123,8 @@ for t=1: Tsim                       % Loop over time
             spktimes_new = spktimes;
             spktimes_all = spktimes_new;
         else
-            spktimes_all = [spktimes_new (spktimes + 10000 * largebin)];
-            spktimes_new = spktimes + 10000 * largebin;
+            spktimes_all = [spktimes_new (spktimes + timesteps_in_1sec * largebin)];
+            spktimes_new = spktimes + timesteps_in_1sec * largebin;
         end;
         %-- input spikes generated
         
@@ -133,8 +135,10 @@ for t=1: Tsim                       % Loop over time
             s_lastE = 0;
             s_lastI = 0;
         else
-            s_lastE = s(rE,1000);   % if already simulating, use value from previous timebin
-            s_lastI = s(rI,1000);
+            % There was a bug here - the s was taken from 100ms since the
+            % start of last 1sec window, not the end of last 1sec window.
+            s_lastE = s(rE,end);   % if already simulating, use value from previous timebin
+            s_lastI = s(rI,end);
         end;
         
         s = zeros(size(InputBool));  % plays as external input drive
@@ -145,7 +149,7 @@ for t=1: Tsim                       % Loop over time
         s(rE,1) = s_lastE + dt*(((1+tanh(V_Input(rE,1)/10))/2).*(1- STOPPER * s_lastE)/tau_R_E -s_lastE/tau_D_E);
         s(rI,1) = s_lastI + dt*(((1+tanh(V_Input(rI,1)/10))/2).*(1- STOPPER * s_lastI)/tau_R_I -s_lastI/tau_D_I);
         
-        for t2=2:10000  
+        for t2=2:timesteps_in_1sec  
             s(rE,t2) = s(rE,t2-1) + dt*(((1+tanh(V_Input(rE,t2)/10))/2).*(1- STOPPER * s(rE,t2-1))/tau_R_E -s(rE,t2-1)/tau_D_E);   % neurotransmitter concentration at the synapse
             s(rI,t2) = s(rI,t2-1) + dt*(((1+tanh(V_Input(rI,t2)/10))/2).*(1- STOPPER * s(rI,t2-1))/tau_R_I -s(rI,t2-1)/tau_D_I);   % neurotransmitter concentration at the synapse
         end
@@ -181,6 +185,7 @@ for t=1: Tsim                       % Loop over time
                         V = V_reset;
                         
                         % For numerical stability, use 'natural' values we have found previously
+                        % TODO: these may be specific to dt=0.1 and that's why other dt values don't work
                         m = 0.04;
                         h = 0.25;
                         n = 0.57;
@@ -188,7 +193,7 @@ for t=1: Tsim                       % Loop over time
                     else
                         V = V_spike;
                         spikes_post = [spikes_post t];
-                        if (Tsim-t) / 10000 <= 5
+                        if (Tsim-t) / timesteps_in_1sec <= 5
                             spikes_last5sec = [spikes_last5sec t];
                         end;
                     end
@@ -202,14 +207,13 @@ for t=1: Tsim                       % Loop over time
                %+ eps*randn(length,1)*sqrt(dt);     % Update V                                                                          %Update I-cell voltage.
                % Euler rule update for m, h, n 
                 m = m + dt*(aM.*(1-m) - bM.*m);
-                h = h + dt*(aH.*(1-h) - bH.*h);                                         % Update h
-                n = n + dt*(aN.*(1-n) - bN.*n);                                         % Update n
+                h = h + dt*(aH.*(1-h) - bH.*h);
+                n = n + dt*(aN.*(1-n) - bN.*n);
                
                 end                
             
                 Vmat(t)   = V ;
                 
-           
                 
           %%% Plasticity  &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
           
@@ -232,7 +236,6 @@ for t=1: Tsim                       % Loop over time
           f = sum(NMDA.I_f*exp(tauf)+NMDA.I_s*exp(taus),2);
           I_NMDA = (g_NMDA*f*H);
           % ---END former loop
-          %fprintf('size of vectorised I_NMDA is %dx%d\n',size(I_NMDA,1),size(I_NMDA,2));
           
           % Learning curve and slope
           if enable_2004
@@ -240,11 +243,10 @@ for t=1: Tsim                       % Loop over time
             eta_val = eta2004(Ca,eta_slope);
           else
             omega = learning_curve2002(learn_curve,Ca);
-            eta_val = eta2002(Ca,eta_slope);
+            eta_val = eta2002(Ca,0) / 10000; %TODO    % 0 is here because the function eta2002 doesn't use the second argument
           end;
           
           % Ca and synaptic weight dynamics
-          
           Ca = Ca + dt*(I_NMDA - Ca/Ca_tau);
           g_plas = g_plas + dt*(eta_val.*(omega-syn_decay_NMDA*g_plas));
                     
