@@ -9,10 +9,10 @@ simulationStartTime = clock;
 %% PAR: Set simulation parameters
 enable_metaplasticity = 0;      % enable metaplasticity?
 enable_inhplasticity = 0;       % enable inhibitory plasticity?
-enable_inhdrive = 0;            % enable inhibition at all?
+enable_inhdrive = 1;            % enable inhibition at all?
 enable_onlyoneinput = 1;        % take input from only 1 synapse?
 enable_100x_speedup = 0;        % should we speed up the simulation? (WORKS ONLY IF WE ARE USING 2004 ETA!)
-enable_2004 = 0;                % are we running 2004 simulations?
+enable_2004 = 1;                % are we running 2004 simulations?
 
 % Load parameters
 if enable_2004
@@ -27,12 +27,12 @@ I0 = 0.0;                       % Basal drive to pyramidal neurons (controls bas
 EPSP_amplitude = 1;             % in mV, rough value
 fprintf('Simulation time: %ds\n', T_sec);
 %fprintf('I0 = %.2f\n', I0);
-fprintf('lambda = %.2f\n', syn_decay_NMDA);
+fprintf('lambda = %.3f\n', syn_decay_NMDA);
 
 % Input trains and # of dendrites
 numDendrites = 120;
 endExc = 100;                    % Last excitatory synapse
-if enable_onlyoneinput && ~enable_2004 % don't run one-input simulations in 2004 mode
+if enable_onlyoneinput % && ~enable_2004 % don't run one-input simulations in 2004 mode
     numDendrites = 2;
     endExc = 1;
 end;
@@ -61,9 +61,13 @@ m = aM./(aM+bM);
 h = aH./(aH+bH);
 n = aN./(aN+bN);
 
-initialWeight = 0.25 / syn_decay_NMDA;  % initialise weights to their stable values
-% generate randomness of +- 5%
-weight_randomness = rand(numDendrites,1) * 0.10 - 0.05;
+if ~enable_2004
+    initialWeight = 0.25 / syn_decay_NMDA;  % initialise weights to their stable values
+    weight_randomness = rand(numDendrites,1) * 0.10 - 0.05; % generate randomness of +- 5%
+else
+    initialWeight = 1;
+    weight_randomness = 0;
+end;
 
 % g_plas are the coefficients we use to get conductivities from their base values.
 % They are named 'w' in the article.
@@ -77,6 +81,7 @@ g_NMDA = stab.gt;                               % Initialize NMDA channel conduc
 
 % Initialisations to save some variables over time
 Ca_history = [];
+f_history = [];
 g_plas_history = [];
 
 % Initialisations for some loop internal variables
@@ -234,6 +239,7 @@ for t=1: Tsim                       % Loop over time
           tauf(tauf==0) = -Inf;
           taus(taus==0) = -Inf;
           f = sum(NMDA.I_f*exp(tauf)+NMDA.I_s*exp(taus),2);
+          f_history = [f_history f(1)];
           I_NMDA = (g_NMDA*f*H);
           % ---END former loop
           
@@ -243,7 +249,7 @@ for t=1: Tsim                       % Loop over time
             eta_val = eta2004(Ca,eta_slope);
           else
             omega = learning_curve2002(learn_curve,Ca);
-            eta_val = eta2002(Ca,0) / 10000; %TODO    % 0 is here because the function eta2002 doesn't use the second argument
+            eta_val = eta2002(Ca,0); %TODO    % 0 is here because the function eta2002 doesn't use the second argument
           end;
           
           % Ca and synaptic weight dynamics
@@ -299,6 +305,6 @@ save(fileName, 'rate_Input', 'rate_Output','T0','dt','I0','gExc','gInh', ...
     'totalComputingTime','enable_metaplasticity','enable_inhplasticity', ...
     'spktimes_all','Ca_history','spikes_post', 'g_plas_history', ...
     'spikes_last5sec','rate_Output5','syn_decay_NMDA', ...
-    'RUINER', 'STOPPER', 'enable_inhdrive', 'EPSP_amplitude');
+    'RUINER', 'STOPPER', 'enable_inhdrive', 'EPSP_amplitude', 'f_history');
 fprintf('Successfully wrote output to %s\n', fileName);
 cd ..;
