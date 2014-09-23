@@ -12,7 +12,7 @@
 
 function [spikes_binary, spiketimes] = GenerateInputSpikes(nrSpikeTrains, rate_total, c, T0, dt, fileName)
 
-rate = rate_total;  % divide the spikes between all synapses
+rate = rate_total;
 
 if (c == 0)
     % how many spikes are we generating in total?
@@ -50,6 +50,8 @@ if (c == 0)
     spiketimes = spiketimes(1:end, 1:rightColumn);       
     
 else
+    
+    % rate = rate_total / nrSpikeTrains; % divide the spikes between all synapses
     
     mother_rate = rate/c;
     spiketimesMother = sort(rand(1, round(mother_rate*T0/1000)) * T0/dt);
