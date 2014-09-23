@@ -26,8 +26,8 @@ Tsim = T0/dt;                   % num of time steps
 I0 = 0.0;                       % Basal drive to pyramidal neurons (controls basal rate; 1.5 -> gamma freq (about 40-50 Hz) when isolated)
 EPSP_amplitude = 1;             % in mV, rough value
 fprintf('Simulation time: %ds\n', T_sec);
-%fprintf('I0 = %.2f\n', I0);
 fprintf('lambda = %.3f\n', syn_decay_NMDA);
+fprintf('100x speedup enabled: %ds\n', enable_100x_speedup);
 
 % Input trains and # of dendrites
 numDendrites = 120;

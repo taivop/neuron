@@ -10,17 +10,45 @@
 %	dt -- (in ms) the length of one timebin.
 %	fileName -- the filename where output should be saved. If empty, no file will be saved.
 
-function [spikes_binary, spiketimes] = GenerateInputSpikes(nrSpikeTrains, rate, c, T0, dt, fileName)
+function [spikes_binary, spiketimes] = GenerateInputSpikes(nrSpikeTrains, rate_total, c, T0, dt, fileName)
+
+rate = rate_total;  % divide the spikes between all synapses
 
 if (c == 0)
+    % how many spikes are we generating in total?
+    num_all_spikes = round(rate*T0/1000);
+    
+    % assign each spike to some synapse
+    spikes_assigned = randi(nrSpikeTrains,num_all_spikes,1);
+    
+    % initialise array of spiketimes; width is num_all_spikes
+    spiketimes = zeros(nrSpikeTrains, num_all_spikes);
+    
     spikes_binary = zeros(nrSpikeTrains, T0/dt);
     for i=1: nrSpikeTrains
-        spiketimes(i,:) = sort(rand(1, round(rate*T0/1000)) * T0/dt);
+        % how many spikes does this particular synapse get?
+        num_spikes_for_this = size(spikes_assigned(spikes_assigned == i),1);
+        %fprintf('synapse %d, %d spikes\n', i, num_spikes_for_this);
+        
+        % divide the spikes assigned to this synapse randomly over time T0
+        spiketime_vector = sort(rand(1, num_spikes_for_this) * T0/dt);
+        
+        % zero-pad the vector and add to spiketimes matrix
+        spiketimes(i,:) = horzcat(spiketime_vector, zeros(1,num_all_spikes-num_spikes_for_this)); 
+        
         for j=1:size(spiketimes,2)
-            spikes_binary(i,ceil(spiketimes(i,j):spiketimes(i,j)+1/dt-1)) = 1;
+            if spiketimes(i,j) ~= 0
+                spikes_binary(i,ceil(spiketimes(i,j):spiketimes(i,j)+1/dt-1)) = 1;
+            end;
         end
     end
     spikes_binary(:,(T0/dt+1):end) = [];
+    
+    % crop un-necessary zeros from spiketimes matrix
+    [nonZeroRows nonZeroColumns] = find(spiketimes);
+    rightColumn = max(nonZeroColumns(:));
+    spiketimes = spiketimes(1:end, 1:rightColumn);       
+    
 else
     
     mother_rate = rate/c;
