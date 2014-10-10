@@ -14,6 +14,8 @@ enable_onlyoneinput = 0;        % take input from only 1 synapse?
 enable_100x_speedup = 1;        % should we speed up the simulation?
 enable_2004 = 1;                % are we running 2004 simulations?
 
+desiredCorrelation = 0.001; % desired correlation for input to excitatory synapses
+
 % Load parameters
 if enable_2004
     SingleNeuron_IF_Taivo_Parameters_2004;
@@ -27,6 +29,7 @@ I0 = 0.0;                       % Basal drive to pyramidal neurons (controls bas
 EPSP_amplitude = 1;             % in mV, rough value
 fprintf('Simulation time: %ds\n', T_sec);
 fprintf('lambda = %.3f\n', syn_decay_NMDA);
+fprintf('desired correlation = %.2f\n', desiredCorrelation);
 fprintf('100x speedup enabled: %ds\n', enable_100x_speedup);
 
 % Input trains and # of dendrites
@@ -114,11 +117,12 @@ for t=1: Tsim                       % Loop over time
         
         
         % Generate input spikes
-        desiredCorrelation = 0; % desired correlation for input to excitatory synapses
 
         [spikes_binary, spiketimes] = GenerateInputSpikes(endExc, rate_Input, desiredCorrelation, 1000, dt, 0);
         [spikes_binary2, spiketimes2] = GenerateInputSpikes(numDendrites-endExc, rate_Input, 0, 1000, dt, 0);
-
+        
+        fprintf('             measured input frequency: %.0fHz\n', sum(sum(spiketimes ~= 0)));
+        
         InputBool = [spikes_binary;spikes_binary2];
         spktimes =  zeros(numDendrites,max(size(spiketimes,2),size(spiketimes2,2)));
         spktimes(1:endExc,1:size(spiketimes,2)) = spiketimes;
@@ -281,7 +285,7 @@ disp('Main loop done.');
 
 %% Postsynaptic spiking frequency display
 numOfSpikes = length(spikes_post);
-fprintf('Input frequency : %.0fHz\n', rate_Input);
+fprintf('Desired input frequency : %.0fHz\n', rate_Input);
 rate_Output = numOfSpikes/(T0/1000);
 fprintf('Output frequency: %.0fHz\n', rate_Output);
 time = min(T0,5000);

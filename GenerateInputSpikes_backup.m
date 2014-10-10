@@ -54,10 +54,8 @@ else
     % rate = rate_total / nrSpikeTrains; % divide the spikes between all synapses
     N0 = nrSpikeTrains + sqrt(c) * (1 - nrSpikeTrains);
     
-    Poisson_event_rate = rate;
-    Poisson_event_times = sort(rand(1, round(Poisson_event_rate*T0/1000)) * T0/dt);
-    
-    % assign Poisson events to synapses somehow
+    mother_rate = rate/c;
+    spiketimesMother = sort(rand(1, round(mother_rate*T0/1000)) * T0/dt);
     spikes_binary = zeros(nrSpikeTrains, T0/dt);
     
     for i=1: nrSpikeTrains
