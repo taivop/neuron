@@ -1,4 +1,4 @@
-function [SpkTime ISIs AFR CV Fano] = HomoPoisSpkGen(r, t)
+function [SpkTime] = HomoPoisSpkGenTaivo(r, t, dt)
 
 
 %load ruido
@@ -15,10 +15,10 @@ function [SpkTime ISIs AFR CV Fano] = HomoPoisSpkGen(r, t)
 
 
 % Time step to go by
-deltaT=0.001; % TODO this is in seconds - should be small enough, otherwise will be clashes
+deltaT=1/1000*dt; % in seconds - should be small enough, otherwise will have clashes between spikes
 SpkTime=[];
 
-% Generating spikes from a exponential distribution
+% Generating spikes from an exponential distribution
 %conta = 0;
 for time=0:deltaT:t
     %conta = conta+1;
@@ -28,21 +28,24 @@ for time=0:deltaT:t
     end
 end
 
-
-% Computing ISIs and AFR
-ISIs=diff(SpkTime);
-AFR=size(SpkTime,1)/t;
+% seconds to timesteps conversion
+SpkTime = SpkTime * 1000 / dt;
 
 
-% Coefficent of variation (CV)
-if ~isempty(ISIs)
-    CV=std(ISIs)/mean(ISIs);    
-else
-    CV=nan;
-end
-
-% Fano Factor (Bined at 50ms)
-[SpkCount dummy]=hist(SpkTime, t/0.05);
-Fano=var(SpkCount)/mean(SpkCount);
-
+% % Computing ISIs and AFR
+% ISIs=diff(SpkTime);
+% AFR=size(SpkTime,1)/t;
+% 
+% 
+% % Coefficent of variation (CV)
+% if ~isempty(ISIs)
+%     CV=std(ISIs)/mean(ISIs);    
+% else
+%     CV=nan;
+% end
+% 
+% % Fano Factor (Bined at 50ms)
+% [SpkCount dummy]=hist(SpkTime, t/0.05);
+% Fano=var(SpkCount)/mean(SpkCount);
+% 
 
