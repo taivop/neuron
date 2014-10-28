@@ -18,7 +18,7 @@ rate = rate_total;
 N0 = round(nrSpikeTrains + sqrt(c) * (1 - nrSpikeTrains));
 %fprintf('N0 = %d\n', N0);
 
-% pregenerate Poissonian trains and put the spiketimes one big vector
+% pregenerate Poissonian trains and put the spiketimes in one big vector
 spktimes_Poisson = [];
 for i=1:N0
     SpkTime = HomoPoisSpkGenTaivo(rate, T0/1000, dt);
@@ -30,12 +30,16 @@ spktimes_Poisson = sort(spktimes_Poisson);
 
 % round spikes to nearest timebin
 spktimes_Poisson = round(spktimes_Poisson);
+% if was rounded to 0, assign 1
+spktimes_Poisson(spktimes_Poisson == 0) = 1;
 
 % assign each spike to some spike train
 master_mask = randi([1,nrSpikeTrains],size(spktimes_Poisson));
 
+MULTIPLY_HOW_MANY_TIMES = N0; % TODO need to find out the value of this constant!
+
 for i=1: nrSpikeTrains
-    mySpikes = spktimes_Poisson(master_mask == i);
+    mySpikes = sort(repmat(spktimes_Poisson(master_mask == i), MULTIPLY_HOW_MANY_TIMES, 1));
     spiketimes(i,1:length(mySpikes)) = mySpikes;
 
     for j=1:length(mySpikes)
