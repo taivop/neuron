@@ -10,9 +10,10 @@
 %	dt -- (in ms) the length of one timebin.
 %	fileName -- the filename where output should be saved. If empty, no file will be saved.
 
-function [spikes_binary, spiketimes] = GenerateInputSpikes(nrSpikeTrains, rate_total, c, T0, dt, fileName)
+function [spikes_binary, spiketimes] = GenerateInputSpikes(nrSpikeTrains, rate_per_syn, c, T0, dt, fileName)
 
-rate = rate_total;
+rate = rate_per_syn;
+spikes_binary = zeros(nrSpikeTrains, T0/dt);
 
 % rate = rate_total / nrSpikeTrains; % divide the spikes between all synapses
 N0 = round(nrSpikeTrains + sqrt(c) * (1 - nrSpikeTrains));
@@ -36,7 +37,7 @@ spktimes_Poisson(spktimes_Poisson == 0) = 1;
 % assign each spike to some spike train
 master_mask = randi([1,nrSpikeTrains],size(spktimes_Poisson));
 
-MULTIPLY_HOW_MANY_TIMES = N0; % TODO need to find out the value of this constant!
+MULTIPLY_HOW_MANY_TIMES = round(nrSpikeTrains / N0); % TODO need to find out the value of this constant!
 
 for i=1: nrSpikeTrains
     mySpikes = sort(repmat(spktimes_Poisson(master_mask == i), MULTIPLY_HOW_MANY_TIMES, 1));
