@@ -4,6 +4,7 @@ function [g_plas_history, rate_Output] = SingleNeuron_IF_Taivo(T_sec, rate_Input
 % filename_spec - the tag you want to add into the name of the output data file.
 
 %% Script initialization
+addpath('helper_functions');
 simulationStartTime = clock;
 
 %% PAR: Set simulation parameters
@@ -30,7 +31,7 @@ EPSP_amplitude = 1;             % in mV, rough value
 fprintf('Simulation time: %ds\n', T_sec);
 fprintf('lambda = %.3f\n', syn_decay_NMDA);
 fprintf('desired correlation = %.2f\n', desiredCorrelation);
-fprintf('100x speedup enabled: %ds\n', enable_100x_speedup);
+fprintf('100x speedup enabled: %d\n', enable_100x_speedup);
 
 % Input trains and # of dendrites
 numDendrites = 120;
