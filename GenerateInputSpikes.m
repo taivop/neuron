@@ -20,7 +20,7 @@ N0 = round(nrSpikeTrains + sqrt(c) * (1 - nrSpikeTrains));
 %fprintf('N0 = %d\n', N0);
 
 % pregenerate Poissonian trains and put the spiketimes in one big vector
-MULTIPLY_HOW_MANY_TIMES = rate/N0;%round((N0 - sqrt(c)) / (N0 * (1 - sqrt(c)))); % TODO need to find out the value of this constant!
+MULTIPLY_HOW_MANY_TIMES = nrSpikeTrains/N0;%round((N0 - sqrt(c)) / (N0 * (1 - sqrt(c)))); % TODO need to find out the value of this constant!
 
 spktimes_Poisson = [];
 for i=1:N0
