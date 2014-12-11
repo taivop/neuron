@@ -1,3 +1,4 @@
+addpath('..');
 
 % vary correlation
 correlation_exp_results = [];
@@ -23,6 +24,7 @@ end;
 
 plot(corrs, correlation_exp_results);
 xlim([0 1]);
+ylim([input_rate * 0.5 input_rate * 1.5]);
 %ylim([input_rate-20, input_rate+20]);
 xlabel('Correlation');
 ylabel('Mean input rate per synapse');
