@@ -8,10 +8,14 @@ for i=1:size(spiketimes,1)
     
     last = max(spiketimes(i,:));
     row = zeros(1,last);
-    row(spiketimes(i,:)) = 1;
+    row(spiketimes(i,spiketimes(i,:) ~= 0)) = 1;
     
     spikebool(i,1:size(row,2)) = row;
     
 end;
 
 imagesc(spikebool);
+colormap(flipud(gray));
+
+xlabel('Timestep');
+ylabel('Input synapse number');
