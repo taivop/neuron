@@ -1,9 +1,16 @@
 
 % vary correlation
 correlation_exp_results = [];
-corrs = [0.001 0.01 0.1 0.3 0.5 0.7 0.9 0.99 0.999 1];
+corrs = [0.001 0.01 0.03 0.05 0.1 0.3 0.5 0.7 0.9 0.99 0.999];
 input_rate = 30;
-for exp_no=1:20
+num_experiments = 9;
+
+fprintf('Running tests to see the rate of generated input as a function of desired correlation.\n');
+fprintf('Ideally, the resulting graph should be constant at desired input rate (%d in this test).\n', input_rate);
+fprintf('Now running %d experiments...\n', num_experiments);
+
+for exp_no=1:num_experiments
+    fprintf('\tExperiment %2d\n', exp_no);
     mean_rates_corr = [];
     for correlation=corrs
         [spikes_binary, spiketimes] = GenerateInputSpikes(100, input_rate, correlation, 1000, 0.1, '');
