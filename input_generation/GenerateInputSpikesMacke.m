@@ -23,20 +23,21 @@ v = mu.*(1-mu);     % calculate the variances
 C = diag(v);        % build covariance matrix
 C(C==0) = c * variance_val;
 
-%% Make binary matrix with Bethge's function
-S = sampleDichGauss01(mu,C,num_timesteps);   % generate samples from the DG model
+%% Make binary matrix with Macke's function
+spikes_binary = sampleDichGauss01(mu,C,num_timesteps);   % generate samples from the DG model
 
-%% Convert binary matrix into good form for us
-% TODO do this by finding every occurrence of 1 and add ten
-% (or eleven -- need to check) 1-s following it.
-
-%% Make spiketimes matrix
+%% Create spiketimes matrix and convert binary matrix into good form for us
+% Finding every occurrence of 1 and adding 1/dt ones to follow it.
 spiketimes = [];
+num_ones = 1 / dt;
 for i=1:num_synapses
-    spiketimes_row = find(S(i,:) == 1);
-    spiketimes = [spiketimes; spiketimes_row]; % TODO also need to zero-pad the row
+    spiketimes_row = find(spikes_binary(i,:) == 1);
+    spiketimes(i,1:length(spiketimes_row)) = spiketimes_row;
+    for ind_start=spiketimes_row
+        ind_end = min(ind_start + num_ones, num_timesteps);
+        spikes_binary(i,ind_start:ind_end) = 1;
+    end;
 end;
-
 
 %% Save to file if necessary
 if (fileName ~= 0)
