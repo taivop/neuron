@@ -11,7 +11,7 @@ simulationStartTime = clock;
 enable_metaplasticity = 0;      % enable metaplasticity?
 enable_inhplasticity = 0;       % enable inhibitory plasticity?
 enable_inhdrive = 0;            % enable inhibition at all?
-enable_onlyoneinput = 0;        % take input from only 1 synapse?
+enable_onlyoneinput = 1;        % take input from only 1 synapse?
 enable_100x_speedup = 1;        % should we speed up the simulation?
 enable_2004 = 1;                % are we running 2004 simulations?
 
@@ -34,13 +34,13 @@ fprintf('desired correlation = %.2f\n', desiredCorrelation);
 fprintf('100x speedup enabled: %d\n', enable_100x_speedup);
 
 % Input trains and # of dendrites
-numDendrites = 120;
-endExc = 100;                    % Last excitatory synapse
+numDendrites = 10;
+endExc = 9;                    % Last excitatory synapse
 if enable_onlyoneinput
     numDendrites = 2;
     endExc = 1;
 end;
-if enable_100x_speedup 
+if enable_100x_speedup && enable_2004
     eta_slope = eta_slope * 100;
     syn_decay_NMDA = syn_decay_NMDA * 100;
     stab.k_minus = 100 * stab.k_minus;
@@ -52,7 +52,7 @@ rE = 1:endExc;                  % Excitatory synapses
 rI = startInh:numDendrites;      % Inhibitory synapses
 
 %% Initializations
-V = -60.0 + 10*rand(1);             % Initial postsynaptic voltage
+V = -60.0 + 0*10*rand(1);             % Initial postsynaptic voltage
 
 % Some parameters to describe how open the gates are
 myPyrGatingFuns = makePyrGatingFuns;
@@ -63,9 +63,9 @@ bH = myPyrGatingFuns.betaH_P(V);
 aN = myPyrGatingFuns.alphaN_P(V);
 bN = myPyrGatingFuns.betaN_P(V);
 
-m = aM./(aM+bM);
-h = aH./(aH+bH);
-n = aN./(aN+bN);
+m = 0.016042971256324;
+h = 0.995496003155816;
+n = 0.040275499396172;
 
 if ~enable_2004
     initialWeight = 0.25 / syn_decay_NMDA;  % initialise weights to their stable values
@@ -101,6 +101,10 @@ val=5*(NMDA.tau_f+NMDA.tau_s)/dt;
 
 %% MAIN LOOP
 
+m_history = [];
+n_history = [];
+h_history = [];
+
 disp('Running main loop...');
 %waitbar(0);
 timesteps_in_1sec = 1000 / dt;
@@ -122,7 +126,7 @@ for t=1: Tsim                       % Loop over time
         [spikes_binary, spiketimes] = GenerateInputSpikes(endExc, rate_Input, desiredCorrelation, 1000, dt, 0);
         [spikes_binary2, spiketimes2] = GenerateInputSpikes(numDendrites-endExc, rate_Input, 0, 1000, dt, 0);
         
-        fprintf('             measured input frequency: %.0fHz\n', sum(sum(spiketimes ~= 0)));
+        fprintf('             measured total input frequency: %.0fHz\n', sum(sum(spiketimes ~= 0)));
         
         InputBool = [spikes_binary;spikes_binary2];
         spktimes =  zeros(numDendrites,max(size(spiketimes,2),size(spiketimes2,2)));
@@ -144,11 +148,9 @@ for t=1: Tsim                       % Loop over time
         V_Input = InputBool*100-70;
         
         if largebin==0              % if we are starting the simulation, set to zero
-            s_lastE = 0;
-            s_lastI = 0;
+            s_lastE = 8.315211133249553e-06;      % found natural initialisation values
+            s_lastI = 1.663028398217609e-05;     % by running simulation with no input
         else
-            % There was a bug here - the s was taken from 100ms since the
-            % start of last 1sec window, not the end of last 1sec window.
             s_lastE = s(rE,end);   % if already simulating, use value from previous timebin
             s_lastI = s(rI,end);
         end;
@@ -156,7 +158,7 @@ for t=1: Tsim                       % Loop over time
         s = zeros(size(InputBool));  % plays as external input drive
         
         STOPPER = 1;
-        EPSP_amplitude_norm = EPSP_amplitude * 1;   % we use this to scale EPSP amplitude to desired value
+        EPSP_amplitude_norm = EPSP_amplitude / 3.7;   % we use this to scale EPSP amplitude to desired value
         
         s(rE,1) = s_lastE + dt*(((1+tanh(V_Input(rE,1)/10))/2).*(1- STOPPER * s_lastE)/tau_R_E -s_lastE/tau_D_E);
         s(rI,1) = s_lastI + dt*(((1+tanh(V_Input(rI,1)/10))/2).*(1- STOPPER * s_lastI)/tau_R_I -s_lastI/tau_D_I);
@@ -185,7 +187,7 @@ for t=1: Tsim                       % Loop over time
                 if ~enable_inhdrive
                     inh_drive = zeros(size(inh_drive));
                 end;
-
+               
                
                 %%% Spike detection and temporary storage  &&&&&&&&&&&&&&&&&&&&
         
@@ -193,11 +195,13 @@ for t=1: Tsim                       % Loop over time
                     if (V==V_spike)
                         V = V_reset;
                         
-                        % For numerical stability, use 'natural' values we have found previously
+                        % For numerical stability, use 'natural' values we
+                        % have found previously by seeing where they are
+                        % if no input is given to neuron.
                         % TODO: these may be specific to dt=0.1 and that's why other dt values don't work
-                        m = 0.04;
-                        h = 0.25;
-                        n = 0.57;
+                        m = 0.016042971256324;
+                        h = 0.995496003155816;
+                        n = 0.040275499396172;
 
                     else
                         V = V_spike;
@@ -276,6 +280,9 @@ for t=1: Tsim                       % Loop over time
           end;
               
           Ca_history = [Ca_history Ca(1)];
+          m_history = [m_history m];
+          n_history = [n_history n];
+          h_history = [h_history h];
           
     
 end
@@ -309,5 +316,7 @@ save(filePath, 'rate_Input', 'rate_Output','T0','dt','I0','gExc','gInh', ...
     'totalComputingTime','enable_metaplasticity','enable_inhplasticity', ...
     'spktimes_all','Ca_history','spikes_post', 'g_plas_history', ...
     'spikes_last5sec','rate_Output5','syn_decay_NMDA', ...
-    'EPSP_amplitude_norm', 'STOPPER', 'enable_inhdrive', 'EPSP_amplitude', 'f_history');
+    'EPSP_amplitude_norm', 'STOPPER', 'enable_inhdrive', 'EPSP_amplitude', ...
+    'f_history', 'spikes_binary', 'spiketimes', 'm', 'h', 'n', 's', ...
+    'm_history', 'n_history', 'h_history');
 fprintf('Successfully wrote output to %s\n', filePath);
