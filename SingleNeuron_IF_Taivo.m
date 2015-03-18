@@ -1,21 +1,21 @@
-function [g_plas_history, rate_Output] = SingleNeuron_IF_Taivo(T_sec, rate_Input, filename_spec)
+function [filePath] = SingleNeuron_IF_Taivo(T_sec, rate_Input, filename_spec)
 % T_sec - simulation time (in seconds), MUST BE INTEGER NUMBER OF SECONDS
 % rate_Input - average input rate to all neurons
 % filename_spec - the tag you want to add into the name of the output data file.
 
 %% Script initialization
-addpath('helper_functions');
+addpath('helper_functions', 'input_generation', 'parameters');
 simulationStartTime = clock;
 
 %% PAR: Set simulation parameters
 enable_metaplasticity = 0;      % enable metaplasticity?
 enable_inhplasticity = 0;       % enable inhibitory plasticity?
-enable_inhdrive = 1;            % enable inhibition at all?
+enable_inhdrive = 0;            % enable inhibition at all?
 enable_onlyoneinput = 0;        % take input from only 1 synapse?
 enable_100x_speedup = 1;        % should we speed up the simulation?
 enable_2004 = 1;                % are we running 2004 simulations?
 
-desiredCorrelation = 0.001; % desired correlation for input to excitatory synapses
+desiredCorrelation = 0; % desired correlation for input to excitatory synapses
 
 % Load parameters
 if enable_2004
@@ -36,7 +36,7 @@ fprintf('100x speedup enabled: %d\n', enable_100x_speedup);
 % Input trains and # of dendrites
 numDendrites = 120;
 endExc = 100;                    % Last excitatory synapse
-if enable_onlyoneinput % && ~enable_2004 % don't run one-input simulations in 2004 mode
+if enable_onlyoneinput
     numDendrites = 2;
     endExc = 1;
 end;
@@ -155,8 +155,8 @@ for t=1: Tsim                       % Loop over time
         
         s = zeros(size(InputBool));  % plays as external input drive
         
-        STOPPER = 0;
-        RUINER = EPSP_amplitude * 1/2.16;
+        STOPPER = 1;
+        EPSP_amplitude_norm = EPSP_amplitude * 1;   % we use this to scale EPSP amplitude to desired value
         
         s(rE,1) = s_lastE + dt*(((1+tanh(V_Input(rE,1)/10))/2).*(1- STOPPER * s_lastE)/tau_R_E -s_lastE/tau_D_E);
         s(rI,1) = s_lastI + dt*(((1+tanh(V_Input(rI,1)/10))/2).*(1- STOPPER * s_lastI)/tau_R_I -s_lastI/tau_D_I);
@@ -168,10 +168,7 @@ for t=1: Tsim                       % Loop over time
         
         %-- neurotransmitter concentrations found
     end;
-   
-    if (mod(t,100)==0)
-         %waitbar(t/Tsim)                  % Progressbar
-    end;
+
                          
                 aM = myPyrGatingFuns.alphaM_P(V);
                 bM = myPyrGatingFuns.betaM_P(V);
@@ -182,8 +179,8 @@ for t=1: Tsim                       % Loop over time
                 
                 % Brought gExc and gInh here for clarity
                 %fprintf('t_inner = %4dms\n',t_inner);
-                exc_drive = gExc * g_plas(rE)'*s(rE,t_inner)*RUINER; % FROM TO
-                inh_drive = gInh * g_plas(rI)'*s(rI,t_inner)*RUINER; %
+                exc_drive = gExc * g_plas(rE)'*s(rE,t_inner)*EPSP_amplitude_norm;
+                inh_drive = gInh * g_plas(rI)'*s(rI,t_inner)*EPSP_amplitude_norm;
                 
                 if ~enable_inhdrive
                     inh_drive = zeros(size(inh_drive));
@@ -300,18 +297,17 @@ fprintf('Simulation time: %ds, total computing time: %.1fs.\n', T_sec, totalComp
 
 
 %% Write data to file
+folderName = 'data_out';
 if strcmpi(filename_spec,'default') || strcmpi(filename_spec,'')
-    fileName = sprintf('out_%s.mat', datestr(now,'yyyy-mm-dd_HH-MM-SS'));
+    filePath = sprintf('%s/out_%s.mat', folderName, datestr(now,'yyyy-mm-dd_HH-MM-SS'));
 else
-    fileName = sprintf('out_%s_%s.mat', filename_spec, datestr(now,'yyyy-mm-dd_HH-MM-SS'));
+    filePath = sprintf('%s/out_%s_%s.mat', folderName, filename_spec, datestr(now,'yyyy-mm-dd_HH-MM-SS'));
 end;
-cd data_out;
 % Save all the relevant stuff
-save(fileName, 'rate_Input', 'rate_Output','T0','dt','I0','gExc','gInh', ...
+save(filePath, 'rate_Input', 'rate_Output','T0','dt','I0','gExc','gInh', ...
     'Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites', ...
     'totalComputingTime','enable_metaplasticity','enable_inhplasticity', ...
     'spktimes_all','Ca_history','spikes_post', 'g_plas_history', ...
     'spikes_last5sec','rate_Output5','syn_decay_NMDA', ...
-    'RUINER', 'STOPPER', 'enable_inhdrive', 'EPSP_amplitude', 'f_history');
-fprintf('Successfully wrote output to %s\n', fileName);
-cd ..;
+    'EPSP_amplitude_norm', 'STOPPER', 'enable_inhdrive', 'EPSP_amplitude', 'f_history');
+fprintf('Successfully wrote output to %s\n', filePath);
