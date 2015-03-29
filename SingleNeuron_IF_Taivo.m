@@ -1,3 +1,4 @@
+
 function [filePath] = SingleNeuron_IF_Taivo(T_sec, rate_Input, filename_spec)
 % T_sec - simulation time (in seconds), MUST BE INTEGER NUMBER OF SECONDS
 % rate_Input - average input rate to all neurons
@@ -11,7 +12,7 @@ simulationStartTime = clock;
 enable_metaplasticity = 0;      % enable metaplasticity?
 enable_inhplasticity = 0;       % enable inhibitory plasticity?
 enable_inhdrive = 0;            % enable inhibition at all?
-enable_onlyoneinput = 1;        % take input from only 1 synapse?
+enable_onlyoneinput = 0;        % take input from only 1 synapse?
 enable_100x_speedup = 1;        % should we speed up the simulation?
 enable_2004 = 1;                % are we running 2004 simulations?
 
@@ -34,8 +35,8 @@ fprintf('desired correlation = %.2f\n', desiredCorrelation);
 fprintf('100x speedup enabled: %d\n', enable_100x_speedup);
 
 % Input trains and # of dendrites
-numDendrites = 10;
-endExc = 9;                    % Last excitatory synapse
+numDendrites = 120;
+endExc = 100;                    % Last excitatory synapse
 if enable_onlyoneinput
     numDendrites = 2;
     endExc = 1;
