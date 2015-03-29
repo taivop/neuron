@@ -12,6 +12,8 @@
 
 function [spikes_binary, spiketimes] = GenerateInputSpikes(nrSpikeTrains, rate_per_syn, c, T0, dt, fileName)
 
+error('(Taivo) Cannot use GenerateInputSpikes because it does not produce correct spikes_binary matrix.');
+
 rate = rate_per_syn;
 spikes_binary = zeros(nrSpikeTrains, T0/dt);
 
@@ -36,7 +38,7 @@ spktimes_Poisson = sort(spktimes_Poisson);
 % round spikes to nearest timebin
 spktimes_Poisson = round(spktimes_Poisson);
 % if was rounded to 0, assign 1. Maybe should remove completely?
-spktimes_Poisson(spktimes_Poisson == 0) = 1;
+%spktimes_Poisson(spktimes_Poisson == 0) = 1;
 
 % assign each spike to some spike train
 master_mask = randi([1,nrSpikeTrains],size(spktimes_Poisson));
@@ -45,8 +47,8 @@ for i=1: nrSpikeTrains
     mySpikes = sort(spktimes_Poisson(master_mask == i));
     spiketimes(i,1:length(mySpikes)) = mySpikes;
 
-    for j=1:length(mySpikes)
-        spikes_binary(i,ceil(mySpikes(j):mySpikes(j)+1/dt-1)) = 1;
+    for spktime=mySpikes(mySpikes ~= 0)
+        spikes_binary(i,ceil(spktime:spktime+1/dt-1)) = 1;
     end
 end
 spikes_binary(:,(T0/dt+1):end) = [];
