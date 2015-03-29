@@ -8,7 +8,7 @@ gNa = 100;                      % Maximal conductivity Na channel
 ENa = 50;                       % Reversal Na channel
 gK = 80;                        % Maximal conductivity K channel
 EK = -100;                      % Reversal K channel
-gL = 0.1;                       % original 0.1 Maximal conductivity leak channel
+gL = 0.1;                       % Maximal conductivity leak channel
 ERest = -67;                    % Reversal leak channel
 
 %% Spiking and basal drive
