@@ -14,16 +14,11 @@ enable_inhplasticity = 0;       % enable inhibitory plasticity?
 enable_inhdrive = 1;            % enable inhibition at all?
 enable_onlyoneinput = 1;        % take input from only 1 synapse?
 enable_100x_speedup = 1;        % should we speed up the simulation?
-enable_2004 = 1;                % are we running 2004 simulations?
 
 desiredCorrelation = 0; % desired correlation for input to excitatory synapses
 
 % Load parameters
-if enable_2004
-    SingleNeuron_IF_Taivo_Parameters_2004;
-else
-    SingleNeuron_IF_Taivo_Parameters_2002;
-end;
+SingleNeuron_IF_Taivo_Parameters_2004;
 
 T0 = T_sec * 1000;              % Simulation length in ms
 Tsim = T0/dt;                   % num of time steps
@@ -41,7 +36,7 @@ if enable_onlyoneinput
     numDendrites = 2;
     endExc = 1;
 end;
-if enable_100x_speedup && enable_2004
+if enable_100x_speedup
     eta_slope = eta_slope * 100;
     syn_decay_NMDA = syn_decay_NMDA * 100;
     stab.k_minus = 100 * stab.k_minus;
@@ -68,23 +63,19 @@ m = 0.016042971256324;
 h = 0.995496003155816;
 n = 0.040275499396172;
 
-if ~enable_2004
-    initialWeight = 0.25 / syn_decay_NMDA;  % initialise weights to their stable values
-    weight_randomness = rand(numDendrites,1) * 0.10 - 0.05; % generate randomness of +- 5%
-else
-    initialWeight = 1;
-    weight_randomness = rand(numDendrites,1) * 0.10 - 0.05;
-end;
+% Initialise weights with some randomness
+initialWeight = 1;
+weight_randomness = rand(numDendrites,1) * 0.10 - 0.05;
 
 % g_plas are the coefficients we use to get conductivities from their base values.
 % They are named 'w' in the article.
-g_plas = (ones(numDendrites,1) + weight_randomness) .* initialWeight;                   % Array with all synaptic weights (evolves during plasticity)
+g_plas = (ones(numDendrites,1) + weight_randomness) .* initialWeight;
 if enable_onlyoneinput
     g_plas(2:end) = 0;
 end;
-g_plas0 = g_plas;                               % Save initial values for plotting later.
+g_plas0 = g_plas;                               % Save initial values
 Ca = zeros(numDendrites,1);                     % Array for calcium concentration in dendrites
-g_NMDA = stab.gt;                               % Initialize NMDA channel conductivity to stable point.
+g_NMDA = stab.gt;                               % Initialize NMDA channel conductivity to stable point (will be changed with metaplasticity)
 
 % Initialisations to save some variables over time
 Ca_history = [];
@@ -254,13 +245,8 @@ for t=1: Tsim                       % Loop over time
           % ---END former loop
           
           % Learning curve and slope
-          if enable_2004
-            omega = learning_curve2004(learn_curve,Ca);
-            eta_val = eta2004(Ca,eta_slope);
-          else
-            omega = learning_curve2002(learn_curve,Ca);
-            eta_val = eta2002(Ca,0); %TODO    % 0 is here because the function eta2002 doesn't use the second argument
-          end;
+          omega = learning_curve2004(learn_curve,Ca);
+          eta_val = eta2004(Ca,eta_slope);
           
           % Ca and synaptic weight dynamics
           Ca = Ca + dt*(I_NMDA - Ca/Ca_tau);
