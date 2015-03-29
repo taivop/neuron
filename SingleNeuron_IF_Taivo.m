@@ -68,12 +68,14 @@ g_NMDA = stab.gt;                               % Initialize NMDA channel conduc
 Ca_history = [];
 f_history = [];
 g_plas_history = [];
+VRest_history = [];
 
 % Initialisations for some loop internal variables
 spikes_post=[];                                 % Output spike times
 spikes_last5sec = [];
 Vmat    = zeros (1,Tsim);                       % Voltage of postsynaptic neuron
 spktimes_all = [];
+VRestChanging = VRest;                          % Initialise resting potential
 
 % Time window to check in the past for release of neurotransmitter
 val=5*(NMDA.tau_f+NMDA.tau_s)/dt;
@@ -98,7 +100,7 @@ for t=1: Tsim                       % Loop over time
         
         % Generate input spikes
 
-        [spikes_binary, spiketimes] = GenerateInputSpikesGroups(endExc, rate_Input, desiredCorrelation, 1000, dt, 0);
+        [spikes_binary, spiketimes] = GenerateInputSpikesMacke(endExc, rate_Input, desiredCorrelation, 1000, dt, 0);
         [spikes_binary2, spiketimes2] = GenerateInputSpikesMacke(numDendrites-endExc, rate_Input, 0, 1000, dt, 0);
         
         fprintf('             measured total input frequency: %.0fHz\n', sum(sum(spiketimes ~= 0)));
@@ -161,6 +163,7 @@ for t=1: Tsim                       % Loop over time
                 if (V>V_sp_thres)
                     if (V==V_spike)
                         V = V_reset;
+                        VRestChanging = VRestChanging - VRest_adapt;
 
                     else
                         V = V_spike;
@@ -171,8 +174,11 @@ for t=1: Tsim                       % Loop over time
                     end
                 else
                  % cell dynamics
-                V = V + dt/tau_m * (gL*(ERest-V) + I0 ...
-                      + inh_drive.*(syn_I-V) + exc_drive.*(syn_E-V));
+                V = V + dt/tau_m * (gLeak*(VRestChanging-V) + I0 ...
+                      + inh_drive.*(VIn-V) + exc_drive.*(VEx-V));
+                  
+                % VRest returning to baseline
+                VRestChanging = VRestChanging + dt / tau_VRest_adapt * (VRest - VRestChanging); 
                
                 end                
             
@@ -186,9 +192,9 @@ for t=1: Tsim                       % Loop over time
           %TODO look here
           t_kernel =  t - spikes_post(spikes_post>(t-(5*(BPAP.tau_f+BPAP.tau_s)/dt)));
           kernel_BPAP = BPAP.V_amp*(BPAP.I_f*exp(-t_kernel./(BPAP.tau_f/dt))+BPAP.I_s*exp(-t_kernel/(BPAP.tau_s/dt)));
-         
+          
           V_BPAP = sum(kernel_BPAP);
-          V_H = ERest + V_BPAP;                              % Magnesium unblocking caused by BPAP
+          V_H = VRestChanging + V_BPAP;                              % Magnesium unblocking caused by BPAP
           H = Mg_block(V_H) * (V - NMDA.Ca_Vrest);
           
           % ---START former loop
@@ -212,7 +218,7 @@ for t=1: Tsim                       % Loop over time
                     
           % Synaptic stabilization aka metaplasticity
           if enable_metaplasticity  
-            g_NMDA = g_NMDA + dt*(-(stab.k_minus*(V_H-ERest).^2 + stab.k_plus).*g_NMDA + stab.k_plus*stab.gt);
+            g_NMDA = g_NMDA + dt*(-(stab.k_minus*(V_H-VRestChanging).^2 + stab.k_plus).*g_NMDA + stab.k_plus*stab.gt);
           end;
           
           if ~enable_inhplasticity
@@ -226,6 +232,7 @@ for t=1: Tsim                       % Loop over time
           end;
               
           Ca_history = [Ca_history Ca(1)];
+          VRest_history = [VRest_history VRestChanging];
           
     
 end
@@ -260,5 +267,5 @@ save(filePath, 'rate_Input', 'rate_Output','T0','dt','I0','gExc','gInh', ...
     'spktimes_all','Ca_history','spikes_post', 'g_plas_history', ...
     'spikes_last5sec','rate_Output5','syn_decay_NMDA', ...
     'EPSP_amplitude_norm', 'STOPPER', 'enable_inhdrive', 'EPSP_amplitude', ...
-    'f_history', 'spikes_binary', 'spiketimes', 's', 'InputBool');
+    'f_history', 'spikes_binary', 'spiketimes', 's', 'InputBool', 'VRest_history');
 fprintf('Successfully wrote output to %s\n', filePath);

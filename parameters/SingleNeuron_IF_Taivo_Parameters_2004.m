@@ -4,14 +4,22 @@
 % #UN - UNknown what the value used in article was
 
 %% Integrate-and-fire model
-V_sp_thres = -55;               % Voltage to define spike has occurred
-V_spike = 40;                   % Voltage a neuron jumps to when spike occurred
-V_reset = -90;                  % Voltage a neuron resets to after spiking
+V_sp_thres = -55;               % #AR-55 (Voltage to define spike has occurred
+V_spike = 40;                   % (none in AR) Voltage a neuron jumps to when spike occurred
+V_reset = -90;                  % # (not said in AR) Voltage a neuron resets to after spiking
 
-gL = 1;                         % Maximal conductivity leak channel
-ERest = -67;                    % Reversal leak channel
+gLeak = 1;                      % #AR1 (implicit) Maximal conductivity of leak channel
+gInh = 0.03;                    % #AR0.03 Maximal synaptic conductivity (AMPA)
+gExc = 0.1;                     % #AR0.1 Maximal synaptic conductivity (GABA)
 
-tau_m = 20;                     % Membrane time constant in ms
+VRest = -65;                    % #AR-65 Reversal potential of leak channel
+VEx = 0;                        % #AR0 Reversal potential of excitatory synapses
+VIn = -65;                      % #AR65 Reversal potential of inhibitory synapses
+
+VRest_adapt = 2;                % #AR2 Resting voltage change upon spike-frequency adaptation (in mV)
+tau_VRest_adapt = 100;          % #AR100 Spike-frequency adaptation time constant (in ms)
+
+tau_m = 20;                     % #AR20 Membrane time constant, ms
 
 
 %% Presynaptic neurotransmitter dynamics
@@ -23,21 +31,10 @@ tau_D_E = 2;
 tau_R_I = 0.5;
 tau_D_I = 10;
 
-syn_E = 0;                      % Reversal potential of excitatory synapses
-syn_I = -65;                    % Reversal potential of inhibitory synapses
-
-% Synaptic conductivities
-g_PP = 0.03;                    %#AR0.03 Maximal synaptic conductivity (AMPA) on pyramidal neurons (had 0.017 previously)
-g_IP = 0.1;                     %#AR0.1 Maximal synaptic conductivity (GABA) on pyramidal neurons
-% Inhibitory conductivity (g_IP) should range in 2x...20x excitatory conductivity (g_PP)
-
-% Set maximal conductivities for inh and exc synapses
-gInh = g_IP;
-gExc = g_PP;
 
 %% BPAP plasticity
 
-BPAP.V_amp = 42 - ERest;       % #AR(42mV - base_value ~= 108mV) Amplitude of BPAP in mV
+BPAP.V_amp = 42;               % #AR42 Amplitude of BPAP (in mV)
 BPAP.I_f = 0.75;               % #AR0.75 Relative magnitude fast component BPAP
 BPAP.I_s = 0.25;               % #AR0.25 Relative magnitude slow component BPAP
 BPAP.tau_f = 3;                % #AR3 Time constant fast component (in ms)
