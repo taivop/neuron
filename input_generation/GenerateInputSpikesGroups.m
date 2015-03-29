@@ -5,8 +5,8 @@ function [spikes_binary, spiketimes] = GenerateInputSpikesGroups(nrSpikeTrains, 
 
 nrTrainsInGroup1 = round(nrSpikeTrains / 2);
 
-[b1, t1] = GenerateInputSpikes(nrTrainsInGroup1, rate_per_syn * 2, c, T0, dt, '');
-[b2, t2] = GenerateInputSpikes(nrSpikeTrains - nrTrainsInGroup1, rate_per_syn, c, T0, dt, '');
+[b1, t1] = GenerateInputSpikesMacke(nrTrainsInGroup1, rate_per_syn * 2, c, T0, dt, '');
+[b2, t2] = GenerateInputSpikesMacke(nrSpikeTrains - nrTrainsInGroup1, rate_per_syn, c, T0, dt, '');
 
 spikes_binary = vertcat(b1, b2);
 
