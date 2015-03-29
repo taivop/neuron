@@ -11,7 +11,7 @@ simulationStartTime = clock;
 %% PAR: Set simulation parameters
 enable_metaplasticity = 0;      % enable metaplasticity?
 enable_inhplasticity = 0;       % enable inhibitory plasticity?
-enable_inhdrive = 0;            % enable inhibition at all?
+enable_inhdrive = 1;            % enable inhibition at all?
 enable_onlyoneinput = 0;        % take input from only 1 synapse?
 enable_100x_speedup = 1;        % should we speed up the simulation?
 enable_2004 = 1;                % are we running 2004 simulations?
@@ -124,8 +124,8 @@ for t=1: Tsim                       % Loop over time
         
         % Generate input spikes
 
-        [spikes_binary, spiketimes] = GenerateInputSpikes(endExc, rate_Input, desiredCorrelation, 1000, dt, 0);
-        [spikes_binary2, spiketimes2] = GenerateInputSpikes(numDendrites-endExc, rate_Input, 0, 1000, dt, 0);
+        [spikes_binary, spiketimes] = GenerateInputSpikesMacke(endExc, rate_Input, desiredCorrelation, 1000, dt, 0);
+        [spikes_binary2, spiketimes2] = GenerateInputSpikesMacke(numDendrites-endExc, rate_Input, 0, 1000, dt, 0);
         
         fprintf('             measured total input frequency: %.0fHz\n', sum(sum(spiketimes ~= 0)));
         
@@ -148,9 +148,9 @@ for t=1: Tsim                       % Loop over time
         % Get neurotransmitter concentrations from presynaptic spikes
         V_Input = InputBool*100-70;
         
-        if largebin==0              % if we are starting the simulation, set to zero
+        if largebin==0              % if we are starting the simulation, set to default values
             s_lastE = 8.315211133249553e-06;      % found natural initialisation values
-            s_lastI = 1.663028398217609e-05;     % by running simulation with no input
+            s_lastI = 1.663028398217609e-05;      % by running simulation with no input
         else
             s_lastE = s(rE,end);   % if already simulating, use value from previous timebin
             s_lastI = s(rI,end);
@@ -213,8 +213,9 @@ for t=1: Tsim                       % Loop over time
                     end
                 else
                  % cell dynamics
-                        V = V + dt*(gNa*m .^3.*h.*(ENa-V) + gK*n.^4.*(EK-V) + gL*(ERest-V) + I0 ...
-                            + inh_drive.*(syn_I-V) + exc_drive.*(syn_E-V));
+                V = V + dt/tau_m * (gNa*m .^3.*h.*(ENa-V) ...
+                      + gK*n.^4.*(EK-V) + gL*(ERest-V) + I0 ...
+                      + inh_drive.*(syn_I-V) + exc_drive.*(syn_E-V));
                 
                         
                 % Simulate some noise, eps is the level of noise
@@ -318,6 +319,5 @@ save(filePath, 'rate_Input', 'rate_Output','T0','dt','I0','gExc','gInh', ...
     'spktimes_all','Ca_history','spikes_post', 'g_plas_history', ...
     'spikes_last5sec','rate_Output5','syn_decay_NMDA', ...
     'EPSP_amplitude_norm', 'STOPPER', 'enable_inhdrive', 'EPSP_amplitude', ...
-    'f_history', 'spikes_binary', 'spiketimes', 'm', 'h', 'n', 's', ...
-    'm_history', 'n_history', 'h_history');
+    'f_history', 'spikes_binary', 'spiketimes', 's', 'InputBool');
 fprintf('Successfully wrote output to %s\n', filePath);

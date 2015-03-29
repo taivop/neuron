@@ -16,6 +16,7 @@ V_sp_thres = -55;               % Voltage to define spike has occurred
 V_spike = 40;                   % Voltage a neuron jumps to when spike occurred
 V_reset = -90;                  % Voltage a neuron resets to after spiking
 
+tau_m = 20;                     % Membrane time constant in ms
 
 
 %% Presynaptic neurotransmitter dynamics
