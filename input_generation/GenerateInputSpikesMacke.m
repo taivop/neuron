@@ -8,9 +8,8 @@
 %	c -- the desired correlation coefficient between the spikes.
 %	T0 -- (in ms) the total amount of time for which the simulation should be done.
 %	dt -- (in ms) the length of one timebin.
-%	fileName -- the filename where output should be saved. If empty, no file will be saved.
-
-function [spikes_binary, spiketimes] = GenerateInputSpikesMacke(num_synapses, rate_per_syn, c, T0, dt, fileName)
+%	fileName -- the filename where output should be saved. If empty, no file will be saved
+function [spikes_binary, spiketimes, c_actual] = GenerateInputSpikesMacke(num_synapses, rate_per_syn, c, T0, dt, fileName)
 
 num_timesteps = T0 / dt;
 
@@ -38,6 +37,9 @@ for i=1:num_synapses
         spikes_binary(i,ind_start:ind_end) = 1;
     end;
 end;
+
+c_pairwise = corrcoef(spikes_binary');
+c_actual = mean(c_pairwise(c_pairwise ~= 1));
 
 %% Save to file if necessary
 if (fileName ~= 0)
