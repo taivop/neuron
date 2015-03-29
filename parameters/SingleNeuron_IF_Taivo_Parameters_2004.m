@@ -12,7 +12,7 @@ gL = 0.1;                       % Maximal conductivity leak channel
 ERest = -67;                    % Reversal leak channel
 
 %% Spiking and basal drive
-V_sp_thres = -50;               % Voltage to define spike has occurred
+V_sp_thres = -55;               % Voltage to define spike has occurred
 V_spike = 40;                   % Voltage a neuron jumps to when spike occurred
 V_reset = -90;                  % Voltage a neuron resets to after spiking
 
@@ -28,7 +28,7 @@ tau_R_I = 0.5;
 tau_D_I = 10;
 
 syn_E = 0;                      % Reversal potential of excitatory synapses
-syn_I = -80;                    % Reversal potential of inhibitory synapses
+syn_I = -65;                    % Reversal potential of inhibitory synapses
 
 % Synaptic conductivities
 g_PP = 0.03;                    %#AR0.03 Maximal synaptic conductivity (AMPA) on pyramidal neurons (had 0.017 previously)
@@ -41,7 +41,7 @@ gExc = g_PP;
 
 %% BPAP plasticity
 
-BPAP.V_amp = 100;              % #AR(42mV - base_value ~= 108mV) Amplitude of BPAP in mV
+BPAP.V_amp = 42 - ERest;       % #AR(42mV - base_value ~= 108mV) Amplitude of BPAP in mV
 BPAP.I_f = 0.75;               % #AR0.75 Relative magnitude fast component BPAP
 BPAP.I_s = 0.25;               % #AR0.25 Relative magnitude slow component BPAP
 BPAP.tau_f = 3;                % #AR3 Time constant fast component (in ms)
