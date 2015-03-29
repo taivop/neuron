@@ -12,7 +12,7 @@ simulationStartTime = clock;
 enable_metaplasticity = 0;      % enable metaplasticity?
 enable_inhplasticity = 0;       % enable inhibitory plasticity?
 enable_inhdrive = 1;            % enable inhibition at all?
-enable_onlyoneinput = 0;        % take input from only 1 synapse?
+enable_onlyoneinput = 1;        % take input from only 1 synapse?
 enable_100x_speedup = 1;        % should we speed up the simulation?
 enable_2004 = 1;                % are we running 2004 simulations?
 
@@ -213,7 +213,7 @@ for t=1: Tsim                       % Loop over time
                     end
                 else
                  % cell dynamics
-                V = V + dt/tau_m * (gNa*m .^3.*h.*(ENa-V) ...
+                V = V + dt * (gNa*m .^3.*h.*(ENa-V) ...
                       + gK*n.^4.*(EK-V) + gL*(ERest-V) + I0 ...
                       + inh_drive.*(syn_I-V) + exc_drive.*(syn_E-V));
                 
