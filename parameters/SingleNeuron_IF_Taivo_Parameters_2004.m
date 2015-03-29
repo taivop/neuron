@@ -3,18 +3,13 @@
 % #AR - same as in the ARticle, followed by the value in the article
 % #UN - UNknown what the value used in article was
 
-%% Ion channel
-gNa = 100;                      % Maximal conductivity Na channel
-ENa = 50;                       % Reversal Na channel
-gK = 80;                        % Maximal conductivity K channel
-EK = -100;                      % Reversal K channel
-gL = 0.1;                       % Maximal conductivity leak channel
-ERest = -67;                    % Reversal leak channel
-
-%% Spiking and basal drive
+%% Integrate-and-fire model
 V_sp_thres = -55;               % Voltage to define spike has occurred
 V_spike = 40;                   % Voltage a neuron jumps to when spike occurred
 V_reset = -90;                  % Voltage a neuron resets to after spiking
+
+gL = 1;                         % Maximal conductivity leak channel
+ERest = -67;                    % Reversal leak channel
 
 tau_m = 20;                     % Membrane time constant in ms
 

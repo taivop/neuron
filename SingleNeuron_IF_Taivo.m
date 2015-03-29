@@ -12,7 +12,7 @@ simulationStartTime = clock;
 enable_metaplasticity = 0;      % enable metaplasticity?
 enable_inhplasticity = 0;       % enable inhibitory plasticity?
 enable_inhdrive = 1;            % enable inhibition at all?
-enable_onlyoneinput = 1;        % take input from only 1 synapse?
+enable_onlyoneinput = 0;        % take input from only 1 synapse?
 enable_100x_speedup = 1;        % should we speed up the simulation?
 
 desiredCorrelation = 0; % desired correlation for input to excitatory synapses
@@ -50,19 +50,6 @@ rI = startInh:numDendrites;      % Inhibitory synapses
 %% Initializations
 V = -60.0 + 0*10*rand(1);             % Initial postsynaptic voltage
 
-% Some parameters to describe how open the gates are
-myPyrGatingFuns = makePyrGatingFuns;
-aM = myPyrGatingFuns.alphaM_P(V);
-bM = myPyrGatingFuns.betaM_P(V);
-aH = myPyrGatingFuns.alphaH_P(V);
-bH = myPyrGatingFuns.betaH_P(V);
-aN = myPyrGatingFuns.alphaN_P(V);
-bN = myPyrGatingFuns.betaN_P(V);
-
-m = 0.016042971256324;
-h = 0.995496003155816;
-n = 0.040275499396172;
-
 % Initialise weights with some randomness
 initialWeight = 1;
 weight_randomness = rand(numDendrites,1) * 0.10 - 0.05;
@@ -93,10 +80,6 @@ val=5*(NMDA.tau_f+NMDA.tau_s)/dt;
 
 %% MAIN LOOP
 
-m_history = [];
-n_history = [];
-h_history = [];
-
 disp('Running main loop...');
 %waitbar(0);
 timesteps_in_1sec = 1000 / dt;
@@ -115,7 +98,7 @@ for t=1: Tsim                       % Loop over time
         
         % Generate input spikes
 
-        [spikes_binary, spiketimes] = GenerateInputSpikesMacke(endExc, rate_Input, desiredCorrelation, 1000, dt, 0);
+        [spikes_binary, spiketimes] = GenerateInputSpikesGroups(endExc, rate_Input, desiredCorrelation, 1000, dt, 0);
         [spikes_binary2, spiketimes2] = GenerateInputSpikesMacke(numDendrites-endExc, rate_Input, 0, 1000, dt, 0);
         
         fprintf('             measured total input frequency: %.0fHz\n', sum(sum(spiketimes ~= 0)));
@@ -162,14 +145,6 @@ for t=1: Tsim                       % Loop over time
         
         %-- neurotransmitter concentrations found
     end;
-
-                         
-                aM = myPyrGatingFuns.alphaM_P(V);
-                bM = myPyrGatingFuns.betaM_P(V);
-                aH = myPyrGatingFuns.alphaH_P(V);
-                bH = myPyrGatingFuns.betaH_P(V);
-                aN = myPyrGatingFuns.alphaN_P(V);
-                bN = myPyrGatingFuns.betaN_P(V);
                 
                 % Brought gExc and gInh here for clarity
                 %fprintf('t_inner = %4dms\n',t_inner);
@@ -186,14 +161,6 @@ for t=1: Tsim                       % Loop over time
                 if (V>V_sp_thres)
                     if (V==V_spike)
                         V = V_reset;
-                        
-                        % For numerical stability, use 'natural' values we
-                        % have found previously by seeing where they are
-                        % if no input is given to neuron.
-                        % TODO: these may be specific to dt=0.1 and that's why other dt values don't work
-                        m = 0.016042971256324;
-                        h = 0.995496003155816;
-                        n = 0.040275499396172;
 
                     else
                         V = V_spike;
@@ -204,17 +171,8 @@ for t=1: Tsim                       % Loop over time
                     end
                 else
                  % cell dynamics
-                V = V + dt * (gNa*m .^3.*h.*(ENa-V) ...
-                      + gK*n.^4.*(EK-V) + gL*(ERest-V) + I0 ...
+                V = V + dt/tau_m * (gL*(ERest-V) + I0 ...
                       + inh_drive.*(syn_I-V) + exc_drive.*(syn_E-V));
-                
-                        
-                % Simulate some noise, eps is the level of noise
-               %+ eps*randn(length,1)*sqrt(dt);     % Update V                                                                          %Update I-cell voltage.
-               % Euler rule update for m, h, n 
-                m = m + dt*(aM.*(1-m) - bM.*m);
-                h = h + dt*(aH.*(1-h) - bH.*h);
-                n = n + dt*(aN.*(1-n) - bN.*n);
                
                 end                
             
@@ -268,9 +226,6 @@ for t=1: Tsim                       % Loop over time
           end;
               
           Ca_history = [Ca_history Ca(1)];
-          m_history = [m_history m];
-          n_history = [n_history n];
-          h_history = [h_history h];
           
     
 end
