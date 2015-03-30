@@ -33,7 +33,7 @@ for i=1:num_synapses
     spiketimes_row = find(spikes_binary(i,:) == 1);
     spiketimes(i,1:length(spiketimes_row)) = spiketimes_row;
     for ind_start=spiketimes_row
-        ind_end = min(ind_start + num_ones, num_timesteps);
+        ind_end = min(ind_start + num_ones, 1); %num_timesteps);
         spikes_binary(i,ind_start:ind_end) = 1;
     end;
 end;
