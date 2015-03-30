@@ -84,6 +84,8 @@ spikes_last5sec = [];
 Vmat    = zeros (1,Tsim);                       % Voltage of postsynaptic neuron
 spktimes_all = [];
 VRestChanging = VRest;                          % Initialise resting potential
+gExc = 0;
+gInh = 0;
 
 % Time window to check in the past for release of neurotransmitter
 val=5*(NMDA.tau_f+NMDA.tau_s)/dt;
@@ -159,10 +161,18 @@ for t=1: Tsim                       % Loop over time
     end;
                 
                 % Brought gExc and gInh here for clarity
-                gExc = gExcMax * g_plas(rE)'*s(rE,t_inner)*EPSP_amplitude_norm;
-                gInh = gInhMax * g_plas(rI)'*s(rI,t_inner)*EPSP_amplitude_norm;
+                %gExc = gExcMax * g_plas(rE)'*s(rE,t_inner)*EPSP_amplitude_norm;
+                %gInh = gInhMax * g_plas(rI)'*s(rI,t_inner)*EPSP_amplitude_norm;
                 
-                %exc_drive = 
+                gExc = gExc ...
+                    + sum(gExcMax * g_plas(rE) * InputBool(rE,t_inner)) ...
+                    + dt/tau_g * (0 - gExc);
+                
+                gInh = gInh ...
+                    + sum(gInhMax * g_plas(rI) * InputBool(rI,t_inner)) ...
+                    + dt/tau_g * (0 - gInh);
+                
+                
                 
                 if ~enable_inhdrive
                     gInh = zeros(size(gInh));
