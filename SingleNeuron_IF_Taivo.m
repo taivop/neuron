@@ -51,19 +51,22 @@ if enable_100x_speedup
 end;
 
 startInh = endExc + 1;          % First inhibitory synapse
-rE = 1:endExc;                  % Excitatory synapses
-rI = startInh:numDendrites;      % Inhibitory synapses
+rE = (1:endExc)';                  % Excitatory synapses
+rI = (startInh:numDendrites)';      % Inhibitory synapses
 
 %% Initializations
 V = VRest + 0*10*rand(1);             % Initial postsynaptic voltage
 
 % Initialise weights with some randomness
-initialWeight = 2;
-weight_randomness = rand(numDendrites,1) * 0.10 - 0.05;
+initialWeightExc = 2;
+initialWeightInh = 1;
+weight_randomness = rand(size(rE)) * 0.10 - 0.05;
 
 % g_plas are the coefficients we use to get conductivities from their base values.
 % They are named 'w' in the article.
-g_plas = (ones(numDendrites,1) + weight_randomness) .* initialWeight;
+g_plas = ones(numDendrites, 1);
+g_plas(rE) = (g_plas(rE) + weight_randomness) * initialWeightExc;
+g_plas(rI) = ones(size(rI));
 if enable_onlyoneinput
     g_plas(2:end) = 0;
 end;
@@ -110,10 +113,11 @@ for t=1: Tsim                       % Loop over time
         
         % Generate input spikes
 
-        [spikes_binary, spiketimes] = GenerateInputSpikesGroups(endExc, rate_Input, desiredCorrelation, 1000, dt, 0);
+        [spikes_binary, spiketimes] = GenerateInputSpikesMacke(endExc, rate_Input, desiredCorrelation, 1000, dt, 0);
         [spikes_binary2, spiketimes2] = GenerateInputSpikesMacke(numDendrites-endExc, rate_Input, 0, 1000, dt, 0);
         
-        fprintf('             measured total input frequency: %.0fHz\n', sum(sum(spiketimes ~= 0)));
+        fprintf('             measured total input rate: %.0fHz\n', sum(sum(spiketimes ~= 0)));
+        %fprintf('             measured total output rate: %.0fHz\n', sum(sum(spiketimes ~= 0)));
         
         InputBool = [spikes_binary;spikes_binary2];
         
@@ -165,11 +169,11 @@ for t=1: Tsim                       % Loop over time
                 %gInh = gInhMax * g_plas(rI)'*s(rI,t_inner)*EPSP_amplitude_norm;
                 
                 gExc = gExc ...
-                    + sum(gExcMax * g_plas(rE) .* InputBool(rE,t_inner)) ...
+                    + gExcMax * sum(g_plas(rE) .* InputBool(rE,t_inner)) ...
                     + dt/tau_g * (0 - gExc);
                 
                 gInh = gInh ...
-                    + sum(gInhMax * g_plas(rI) .* InputBool(rI,t_inner)) ...
+                    + gInhMax * sum(g_plas(rI) .* InputBool(rI,t_inner)) ...
                     + dt/tau_g * (0 - gInh);
                 
                 
@@ -243,7 +247,7 @@ for t=1: Tsim                       % Loop over time
           end;
           
           if ~enable_inhplasticity
-            g_plas(startInh:numDendrites) = initialWeight;  % Remove plasticity from inh synapses
+            g_plas(startInh:numDendrites) = initialWeightInh;  % Remove plasticity from inh synapses
           end;
           
           if enable_onlyoneinput
