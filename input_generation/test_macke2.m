@@ -16,7 +16,7 @@ C(C==0) = c * variance_val;
 
 S = sampleDichGauss01(mu, C, num_timesteps);   % generate samples from the DG model
 
-% plot spikes in raster plot
+%% plot spikes in raster plot and histogram of rates
 imagesc(S)
 colormap(flipud(gray));
 
@@ -31,4 +31,4 @@ c_res = corrcoef(S');
 % take mean pairwise correlation
 mean_resulting_corr = mean(c_res(c_res ~= 1));
 
-fprintf('Wanted correlation %.2f, got correlation %.2f', c, mean_resulting_corr);
+fprintf('Wanted correlation %.2f, got correlation %.2f\n', c, mean_resulting_corr);
