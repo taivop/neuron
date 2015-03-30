@@ -1,12 +1,12 @@
-addpath('..');
+addpath('..', '../input_generation');
 
 dt = 0.1;
 T0 = 1000;
 
-[spikes_binary, spiketimes] = GenerateInputSpikes(100, 30, 1, T0, dt, '');
+[spikes_binary, spiketimes, c_actual] = GenerateInputSpikesMacke(100, 30, 0.5, T0, dt, '');
 %check correlation coefficient
 nrpairs = 100;
-for i=1:1
+for i=1:50
     
     num_spikes_total = sum(sum(spiketimes ~= 0))
     

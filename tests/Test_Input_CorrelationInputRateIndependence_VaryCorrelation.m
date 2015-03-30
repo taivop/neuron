@@ -1,10 +1,10 @@
-addpath('..');
+addpath('..', '../input_generation');
 
 % vary correlation
 correlation_exp_results = [];
 corrs = [0.001 0.01 0.03 0.05 0.1 0.3 0.5 0.7 0.9 0.99 0.999];
 input_rate = 30;
-num_experiments = 9;
+num_experiments = 3;
 
 fprintf('Running tests to see the rate of generated input as a function of desired correlation.\n');
 fprintf('Ideally, the resulting graph should be constant at desired input rate (%d in this test).\n', input_rate);
@@ -14,7 +14,7 @@ for exp_no=1:num_experiments
     fprintf('\tExperiment %2d\n', exp_no);
     mean_rates_corr = [];
     for correlation=corrs
-        [spikes_binary, spiketimes] = GenerateInputSpikes(100, input_rate, correlation, 1000, 0.1, '');
+        [spikes_binary, spiketimes, c_actual] = GenerateInputSpikesMacke(100, input_rate, correlation, 1000, 0.1, '');
         mean_rate_per_syn = mean(sum(spiketimes ~= 0, 2));
         mean_rates_corr = [mean_rates_corr mean_rate_per_syn];
     end;
