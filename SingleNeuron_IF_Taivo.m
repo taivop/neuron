@@ -4,15 +4,22 @@ function [filePath] = SingleNeuron_IF_Taivo(T_sec, rate_Input, filename_spec)
 % rate_Input - average input rate to all neurons
 % filename_spec - the tag you want to add into the name of the output data file.
 
-%% Script initialization
+%% Script initialization & paths
 addpath('helper_functions', 'input_generation', 'parameters');
+
+% Paths for input generation
+p = 'input_generation/mackeetal';
+addpath(p)
+addpath(fullfile(p,'lib'))
+addpath(fullfile(p,'interface'))
+
 simulationStartTime = clock;
 
 %% PAR: Set simulation parameters
 enable_metaplasticity = 0;      % enable metaplasticity?
 enable_inhplasticity = 0;       % enable inhibitory plasticity?
 enable_inhdrive = 1;            % enable inhibition at all?
-enable_onlyoneinput = 0;        % take input from only 1 synapse?
+enable_onlyoneinput = 1;        % take input from only 1 synapse?
 enable_100x_speedup = 1;        % should we speed up the simulation?
 
 desiredCorrelation = 0; % desired correlation for input to excitatory synapses
@@ -48,10 +55,10 @@ rE = 1:endExc;                  % Excitatory synapses
 rI = startInh:numDendrites;      % Inhibitory synapses
 
 %% Initializations
-V = -60.0 + 0*10*rand(1);             % Initial postsynaptic voltage
+V = VRest + 0*10*rand(1);             % Initial postsynaptic voltage
 
 % Initialise weights with some randomness
-initialWeight = 1;
+initialWeight = 2;
 weight_randomness = rand(numDendrites,1) * 0.10 - 0.05;
 
 % g_plas are the coefficients we use to get conductivities from their base values.
@@ -100,7 +107,7 @@ for t=1: Tsim                       % Loop over time
         
         % Generate input spikes
 
-        [spikes_binary, spiketimes] = GenerateInputSpikesMacke(endExc, rate_Input, desiredCorrelation, 1000, dt, 0);
+        [spikes_binary, spiketimes] = GenerateInputSpikesGroups(endExc, rate_Input, desiredCorrelation, 1000, dt, 0);
         [spikes_binary2, spiketimes2] = GenerateInputSpikesMacke(numDendrites-endExc, rate_Input, 0, 1000, dt, 0);
         
         fprintf('             measured total input frequency: %.0fHz\n', sum(sum(spiketimes ~= 0)));
@@ -135,7 +142,7 @@ for t=1: Tsim                       % Loop over time
         s = zeros(size(InputBool));  % plays as external input drive
         
         STOPPER = 1;
-        EPSP_amplitude_norm = EPSP_amplitude / 3.7;   % we use this to scale EPSP amplitude to desired value
+        EPSP_amplitude_norm = EPSP_amplitude / 1.31; % we use this to scale EPSP amplitude to desired value
         
         s(rE,1) = s_lastE + dt*(((1+tanh(V_Input(rE,1)/10))/2).*(1- STOPPER * s_lastE)/tau_R_E -s_lastE/tau_D_E);
         s(rI,1) = s_lastI + dt*(((1+tanh(V_Input(rI,1)/10))/2).*(1- STOPPER * s_lastI)/tau_R_I -s_lastI/tau_D_I);
@@ -222,8 +229,6 @@ for t=1: Tsim                       % Loop over time
           end;
           
           if ~enable_inhplasticity
-              % TODO: what should be the (unchanging) weight of inh
-              % synapses?   
             g_plas(startInh:numDendrites) = initialWeight;  % Remove plasticity from inh synapses
           end;
           
