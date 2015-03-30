@@ -1,4 +1,5 @@
 *.asv
+*.Rhistory
 data_out/
 figures/
 making_faster/
