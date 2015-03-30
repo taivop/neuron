@@ -19,7 +19,7 @@ simulationStartTime = clock;
 enable_metaplasticity = 0;      % enable metaplasticity?
 enable_inhplasticity = 0;       % enable inhibitory plasticity?
 enable_inhdrive = 1;            % enable inhibition at all?
-enable_onlyoneinput = 1;        % take input from only 1 synapse?
+enable_onlyoneinput = 0;        % take input from only 1 synapse?
 enable_100x_speedup = 1;        % should we speed up the simulation?
 
 desiredCorrelation = 0; % desired correlation for input to excitatory synapses
@@ -165,11 +165,11 @@ for t=1: Tsim                       % Loop over time
                 %gInh = gInhMax * g_plas(rI)'*s(rI,t_inner)*EPSP_amplitude_norm;
                 
                 gExc = gExc ...
-                    + sum(gExcMax * g_plas(rE) * InputBool(rE,t_inner)) ...
+                    + sum(gExcMax * g_plas(rE) .* InputBool(rE,t_inner)) ...
                     + dt/tau_g * (0 - gExc);
                 
                 gInh = gInh ...
-                    + sum(gInhMax * g_plas(rI) * InputBool(rI,t_inner)) ...
+                    + sum(gInhMax * g_plas(rI) .* InputBool(rI,t_inner)) ...
                     + dt/tau_g * (0 - gInh);
                 
                 
