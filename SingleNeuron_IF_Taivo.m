@@ -76,6 +76,7 @@ Ca_history = [];
 f_history = [];
 g_plas_history = [];
 VRest_history = [];
+gExc_history = [];
 
 % Initialisations for some loop internal variables
 spikes_post=[];                                 % Output spike times
@@ -157,11 +158,13 @@ for t=1: Tsim                       % Loop over time
                 
                 % Brought gExc and gInh here for clarity
                 %fprintf('t_inner = %4dms\n',t_inner);
-                exc_drive = gExc * g_plas(rE)'*s(rE,t_inner)*EPSP_amplitude_norm;
-                inh_drive = gInh * g_plas(rI)'*s(rI,t_inner)*EPSP_amplitude_norm;
+                gExc = gExcMax * g_plas(rE)'*s(rE,t_inner)*EPSP_amplitude_norm;
+                gInh = gInhMax * g_plas(rI)'*s(rI,t_inner)*EPSP_amplitude_norm;
+                
+                %exc_drive = 
                 
                 if ~enable_inhdrive
-                    inh_drive = zeros(size(inh_drive));
+                    gInh = zeros(size(gInh));
                 end;
                
                
@@ -182,7 +185,7 @@ for t=1: Tsim                       % Loop over time
                 else
                  % cell dynamics
                 V = V + dt/tau_m * (gLeak*(VRestChanging-V) + I0 ...
-                      + inh_drive.*(VIn-V) + exc_drive.*(VEx-V));
+                      + gInh.*(VIn-V) + gExc.*(VEx-V));
                   
                 % VRest returning to baseline
                 VRestChanging = VRestChanging + dt / tau_VRest_adapt * (VRest - VRestChanging); 
@@ -238,6 +241,7 @@ for t=1: Tsim                       % Loop over time
               
           Ca_history = [Ca_history Ca(1)];
           VRest_history = [VRest_history VRestChanging];
+          gExc_history = [gExc_history gExc];
           
     
 end
@@ -266,11 +270,12 @@ else
     filePath = sprintf('%s/out_%s_%s.mat', folderName, filename_spec, datestr(now,'yyyy-mm-dd_HH-MM-SS'));
 end;
 % Save all the relevant stuff
-save(filePath, 'rate_Input', 'rate_Output','T0','dt','I0','gExc','gInh', ...
+save(filePath, 'rate_Input', 'rate_Output','T0','dt','I0','gExcMax','gInhMax', ...
     'Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites', ...
     'totalComputingTime','enable_metaplasticity','enable_inhplasticity', ...
     'spktimes_all','Ca_history','spikes_post', 'g_plas_history', ...
     'spikes_last5sec','rate_Output5','syn_decay_NMDA', ...
     'EPSP_amplitude_norm', 'STOPPER', 'enable_inhdrive', 'EPSP_amplitude', ...
-    'f_history', 'spikes_binary', 'spiketimes', 's', 'InputBool', 'VRest_history');
+    'f_history', 'spikes_binary', 'spiketimes', 's', 'InputBool', ...
+    'VRest_history', 'gExc_history');
 fprintf('Successfully wrote output to %s\n', filePath);

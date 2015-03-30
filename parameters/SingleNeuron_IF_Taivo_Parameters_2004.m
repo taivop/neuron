@@ -9,8 +9,8 @@ V_spike = 40;                   % (none in AR) Voltage a neuron jumps to when sp
 V_reset = -90;                  % # (not said in AR) Voltage a neuron resets to after spiking
 
 gLeak = 1;                      % #AR1 (implicit) Maximal conductivity of leak channel
-gInh = 0.03;                    % #AR0.03 Maximal synaptic conductivity (AMPA)
-gExc = 0.1;                     % #AR0.1 Maximal synaptic conductivity (GABA)
+gInhMax = 0.03;                 % #AR0.03 Maximal synaptic conductivity (AMPA)
+gExcMax = 0.1;                  % #AR0.1 Maximal synaptic conductivity (GABA)
 
 VRest = -65;                    % #AR-65 Reversal potential of leak channel
 VEx = 0;                        % #AR0 Reversal potential of excitatory synapses
@@ -20,6 +20,7 @@ VRest_adapt = 2;                % #AR2 Resting voltage change upon spike-frequen
 tau_VRest_adapt = 100;          % #AR100 Spike-frequency adaptation time constant (in ms)
 
 tau_m = 20;                     % #AR20 Membrane time constant, ms
+tau_g = 5;                      % #AR5 Presynaptic drive decay time constant, ms
 
 
 %% Presynaptic neurotransmitter dynamics
