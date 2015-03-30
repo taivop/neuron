@@ -9,8 +9,8 @@ V_spike = 40;                   % (none in AR) Voltage a neuron jumps to when sp
 V_reset = -90;                  % # (not said in AR) Voltage a neuron resets to after spiking
 
 gLeak = 1;                      % #AR1 (implicit) Maximal conductivity of leak channel
-gInhMax = 0.03;                 % #AR0.03 Maximal synaptic conductivity (AMPA)
-gExcMax = 0.1;                  % #AR0.1 Maximal synaptic conductivity (GABA)
+gExcMax = 0.03;                 % #AR0.03 Maximal synaptic conductivity (AMPA)
+gInhMax = 0.1;                  % #AR0.1 Maximal synaptic conductivity (GABA)
 
 VRest = -65;                    % #AR-65 Reversal potential of leak channel
 VEx = 0;                        % #AR0 Reversal potential of excitatory synapses
