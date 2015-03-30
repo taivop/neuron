@@ -114,6 +114,8 @@ for t=1: Tsim                       % Loop over time
         fprintf('             measured total input frequency: %.0fHz\n', sum(sum(spiketimes ~= 0)));
         
         InputBool = [spikes_binary;spikes_binary2];
+        
+        % Zero-padding for concatenation
         spktimes =  zeros(numDendrites,max(size(spiketimes,2),size(spiketimes2,2)));
         spktimes(1:endExc,1:size(spiketimes,2)) = spiketimes;
         spktimes(startInh:numDendrites,1:size(spiketimes2,2)) = spiketimes2;
@@ -157,7 +159,6 @@ for t=1: Tsim                       % Loop over time
     end;
                 
                 % Brought gExc and gInh here for clarity
-                %fprintf('t_inner = %4dms\n',t_inner);
                 gExc = gExcMax * g_plas(rE)'*s(rE,t_inner)*EPSP_amplitude_norm;
                 gInh = gInhMax * g_plas(rI)'*s(rI,t_inner)*EPSP_amplitude_norm;
                 
