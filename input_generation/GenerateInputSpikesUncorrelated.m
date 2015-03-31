@@ -23,9 +23,9 @@ spikes_binary = zeros(nrSpikeTrains, T0/dt);
 spiketimes = [];
 
 % Build spiketimes matrix
-for i=1:nrSpikeTrains
+for j=1:nrSpikeTrains
     newRow = HomoPoisSpkGenTaivo(rate, T0/1000, dt)';
-    if i==1
+    if j==1
         spiketimes = newRow;
     else
         % zero-pad spiketimes matrix
@@ -42,7 +42,7 @@ for i=1:nrSpikeTrains
         end;
         
         % vertcat 'newRow' to 'spiketimes'
-        spiketimes = [spiketimes; newRow];
+        spiketimes(j,:) = newRow;
     end;
 end;
 
