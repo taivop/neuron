@@ -28,7 +28,7 @@ spikes_binary = sampleDichGauss01(mu,C,num_timesteps);   % generate samples from
 %% Create spiketimes matrix and convert binary matrix into good form for us
 % Finding every occurrence of 1 and adding 1/dt ones to follow it.
 spiketimes = [];
-num_ones = 0; % actually will be 1;
+num_ones = 1/dt - 1;
 for i=1:num_synapses
     spiketimes_row = find(spikes_binary(i,:) == 1);
     spiketimes(i,1:length(spiketimes_row)) = spiketimes_row;
