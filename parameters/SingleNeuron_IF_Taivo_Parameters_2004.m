@@ -11,7 +11,11 @@ V_reset = -90;                  % # (not said in AR) Voltage a neuron resets to 
 gLeak = 1;                      % #AR1 (implicit) Maximal conductivity of leak channel
 gExcMax = 0.03;                 % #AR0.03 Maximal synaptic conductivity (AMPA)
 gInhMax = 0.1;                  % #AR0.1 Maximal synaptic conductivity (GABA)
+gK = 80;                        % Maximal conductivity K channel
+gNa = 100;                      % Maximal conductivity Na channel
 
+VNa = 50;                       % Reversal potential of Na channel
+VK = -100;                      % Reversal potential of K channel
 VRest = -65;                    % #AR-65 Reversal potential of leak channel
 VEx = 0;                        % #AR0 Reversal potential of excitatory synapses
 VIn = -65;                      % #AR65 Reversal potential of inhibitory synapses

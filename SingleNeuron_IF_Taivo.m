@@ -62,11 +62,23 @@ initialWeightExc = 2;
 initialWeightInh = 1;
 weight_randomness = rand(size(rE)) * 0.10 - 0.05;
 
+% Some parameters to describe how open the gates are		
+myPyrGatingFuns = makePyrGatingFuns;		
+aM = myPyrGatingFuns.alphaM_P(V);		
+bM = myPyrGatingFuns.betaM_P(V);		
+aH = myPyrGatingFuns.alphaH_P(V);		
+bH = myPyrGatingFuns.betaH_P(V);		
+aN = myPyrGatingFuns.alphaN_P(V);		
+bN = myPyrGatingFuns.betaN_P(V);		
+m = 0.016042971256324;		
+h = 0.995496003155816;		
+n = 0.040275499396172;		
+
 % g_plas are the coefficients we use to get conductivities from their base values.
 % They are named 'w' in the article.
 g_plas = ones(numDendrites, 1);
 g_plas(rE) = (g_plas(rE) + weight_randomness) * initialWeightExc;
-g_plas(rI) = ones(size(rI));
+g_plas(rI) = g_plas(rI) * initialWeightInh;
 if enable_onlyoneinput
     g_plas(2:end) = 0;
 end;
@@ -163,20 +175,18 @@ for t=1: Tsim                       % Loop over time
         
         %-- neurotransmitter concentrations found
     end;
+    
+    
+                aM = myPyrGatingFuns.alphaM_P(V);
+                bM = myPyrGatingFuns.betaM_P(V);
+                aH = myPyrGatingFuns.alphaH_P(V);
+                bH = myPyrGatingFuns.betaH_P(V);
+                aN = myPyrGatingFuns.alphaN_P(V);
+                bN = myPyrGatingFuns.betaN_P(V);
                 
                 % Brought gExc and gInh here for clarity
-                %gExc = gExcMax * g_plas(rE)'*s(rE,t_inner)*EPSP_amplitude_norm;
-                %gInh = gInhMax * g_plas(rI)'*s(rI,t_inner)*EPSP_amplitude_norm;
-                
-                gExc = gExc ...
-                    + gExcMax * sum(g_plas(rE) .* InputBool(rE,t_inner)) ...
-                    + dt/tau_g * (0 - gExc);
-                
-                gInh = gInh ...
-                    + gInhMax * sum(g_plas(rI) .* InputBool(rI,t_inner)) ...
-                    + dt/tau_g * (0 - gInh);
-                
-                
+                gExc = gExcMax * g_plas(rE)'*s(rE,t_inner)*EPSP_amplitude_norm;
+                gInh = gInhMax * g_plas(rI)'*s(rI,t_inner)*EPSP_amplitude_norm;
                 
                 if ~enable_inhdrive
                     gInh = zeros(size(gInh));
@@ -189,6 +199,13 @@ for t=1: Tsim                       % Loop over time
                     if (V==V_spike)
                         V = V_reset;
                         VRestChanging = VRestChanging - VRest_adapt;
+                        
+                        % For numerical stability, use 'natural' values we		
+                        % have found previously by seeing where they are		
+                        % if no input is given to neuron.		
+                        m = 0.016042971256324;		
+                        h = 0.995496003155816;		
+                        n = 0.040275499396172;
 
                     else
                         V = V_spike;
@@ -199,10 +216,16 @@ for t=1: Tsim                       % Loop over time
                     end
                 else
                  % cell dynamics
-                V = V + dt/tau_m * (gLeak*(VRestChanging-V) + I0 ...
-                      + gInh.*(VIn-V) + gExc.*(VEx-V));
+                 V = V + dt * (gNa*m .^3.*h.*(VNa-V) ...
+                       + gK*n.^4.*(VK-V) + gLeak*(VRestChanging-V) + I0 ...		
+                       + gInh.*(VIn-V) + gExc.*(VEx-V));
+                   
+                % Euler update for m, h, n 
+                m = m + dt*(aM.*(1-m) - bM.*m);
+                h = h + dt*(aH.*(1-h) - bH.*h);
+                n = n + dt*(aN.*(1-n) - bN.*n);   
                   
-                % VRest returning to baseline
+                % VRest decay towards baseline
                 VRestChanging = VRestChanging + dt / tau_VRest_adapt * (VRest - VRestChanging); 
                
                 end                
