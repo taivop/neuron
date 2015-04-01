@@ -17,6 +17,6 @@ cd ../tests
 # Set queue
 #SBATCH -p testing
 
-srun /storage/software/MATLAB_R2013b/bin/matlab -nodisplay -nosplash -nojvm -r "exp_STDP"
+srun /storage/software/MATLAB_R2013b/bin/matlab -nodisplay -nosplash -nojvm -r "exp_InputRate"
 
 exit
