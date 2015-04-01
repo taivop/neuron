@@ -1,5 +1,5 @@
 
-function [filePath] = SingleNeuron_IF_Taivo(T_sec, rate_Input, filename_spec)
+function [filePath] = SingleNeuron_IF_Taivo(T_sec, rate_Input, filename_spec, varargin)
 % T_sec - simulation time (in seconds), MUST BE INTEGER NUMBER OF SECONDS
 % rate_Input - average input rate to all neurons
 % filename_spec - the tag you want to add into the name of the output data file.
@@ -16,12 +16,6 @@ addpath(fullfile(p,'interface'))
 simulationStartTime = clock;
 
 %% PAR: Set simulation parameters
-enable_metaplasticity = 0;      % enable metaplasticity?
-enable_inhplasticity = 0;       % enable inhibitory plasticity?
-enable_inhdrive = 1;            % enable inhibition at all?
-enable_onlyoneinput = 0;        % take input from only 1 synapse?
-enable_100x_speedup = 1;        % should we speed up the simulation?
-
 desiredCorrelation = 0; % desired correlation for input to excitatory synapses
 
 % Load parameters
@@ -31,19 +25,30 @@ T0 = T_sec * 1000;              % Simulation length in ms
 Tsim = T0/dt;                   % num of time steps
 I0 = 0.0;                       % Basal drive to pyramidal neurons (controls basal rate; 1.5 -> gamma freq (about 40-50 Hz) when isolated)
 EPSP_amplitude = 1;             % in mV, rough value
-fprintf('Simulation time: %ds\n', T_sec);
-fprintf('lambda = %.3f\n', syn_decay_NMDA);
-fprintf('desired correlation = %.2f\n', desiredCorrelation);
-fprintf('100x speedup enabled: %d\n', enable_100x_speedup);
 
-% Input trains and # of dendrites
-numDendrites = 120;
-endExc = 100;                    % Last excitatory synapse
-if enable_onlyoneinput
+
+%% Assign optional function argument values if any were given, otherwise use defaults
+p = inputParser;
+addParameter(p,'enable_metaplasticity',0);
+addParameter(p,'enable_inhplasticity',0);
+addParameter(p,'enable_inhdrive',1);
+addParameter(p,'enable_onlyoneinput',0);
+addParameter(p,'enable_100x_speedup',1);
+addParameter(p,'numDendrites',120);
+addParameter(p,'endExc',100);
+
+parse(p, varargin{:});
+parsedParams = p.Results; % for saving
+
+numDendrites = p.Results.numDendrites;
+endExc = p.Results.endExc;
+
+%% Change parameters based on options given
+if p.Results.enable_onlyoneinput
     numDendrites = 2;
     endExc = 1;
 end;
-if enable_100x_speedup
+if p.Results.enable_100x_speedup
     eta_slope = eta_slope * 100;
     syn_decay_NMDA = syn_decay_NMDA * 100;
     stab.k_minus = 100 * stab.k_minus;
@@ -53,6 +58,12 @@ end;
 startInh = endExc + 1;          % First inhibitory synapse
 rE = (1:endExc)';                  % Excitatory synapses
 rI = (startInh:numDendrites)';      % Inhibitory synapses
+
+
+fprintf('Simulation time: %ds\n', T_sec);
+fprintf('lambda = %.3f\n', syn_decay_NMDA);
+fprintf('desired correlation = %.2f\n', desiredCorrelation);
+fprintf('100x speedup enabled: %d\n', p.Results.enable_100x_speedup);
 
 %% Initializations
 V = VRest + 0*10*rand(1);             % Initial postsynaptic voltage
@@ -79,7 +90,7 @@ n = 0.040275499396172;
 g_plas = ones(numDendrites, 1);
 g_plas(rE) = (g_plas(rE) + weight_randomness) * initialWeightExc;
 g_plas(rI) = g_plas(rI) * initialWeightInh;
-if enable_onlyoneinput
+if p.Results.enable_onlyoneinput
     g_plas(2:end) = 0;
 end;
 g_plas0 = g_plas;                               % Save initial values
@@ -163,7 +174,7 @@ for t=1: Tsim                       % Loop over time
         s = zeros(size(InputBool));  % plays as external input drive
         
         STOPPER = 1;
-        EPSP_amplitude_norm = EPSP_amplitude / 1.31; % we use this to scale EPSP amplitude to desired value
+        EPSP_amplitude_norm = EPSP_amplitude / 2; % we use this to scale EPSP amplitude to desired value
         
         s(rE,1) = s_lastE + dt*(((1+tanh(V_Input(rE,1)/10))/2).*(1- STOPPER * s_lastE)/tau_R_E -s_lastE/tau_D_E);
         s(rI,1) = s_lastI + dt*(((1+tanh(V_Input(rI,1)/10))/2).*(1- STOPPER * s_lastI)/tau_R_I -s_lastI/tau_D_I);
@@ -188,7 +199,7 @@ for t=1: Tsim                       % Loop over time
                 gExc = gExcMax * g_plas(rE)'*s(rE,t_inner)*EPSP_amplitude_norm;
                 gInh = gInhMax * g_plas(rI)'*s(rI,t_inner)*EPSP_amplitude_norm;
                 
-                if ~enable_inhdrive
+                if ~p.Results.enable_inhdrive
                     gInh = zeros(size(gInh));
                 end;
                
@@ -265,15 +276,15 @@ for t=1: Tsim                       % Loop over time
           g_plas = g_plas + dt*(eta_val.*(omega-syn_decay_NMDA*g_plas));
                     
           % Synaptic stabilization aka metaplasticity
-          if enable_metaplasticity  
+          if p.Results.enable_metaplasticity  
             g_NMDA = g_NMDA + dt*(-(stab.k_minus*(V_H-VRestChanging).^2 + stab.k_plus).*g_NMDA + stab.k_plus*stab.gt);
           end;
           
-          if ~enable_inhplasticity
+          if ~p.Results.enable_inhplasticity
             g_plas(startInh:numDendrites) = initialWeightInh;  % Remove plasticity from inh synapses
           end;
           
-          if enable_onlyoneinput
+          if p.Results.enable_onlyoneinput
               g_plas(2:end) = 0;
           end;
               
@@ -310,10 +321,10 @@ end;
 % Save all the relevant stuff
 save(filePath, 'rate_Input', 'rate_Output','T0','dt','I0','gExcMax','gInhMax', ...
     'Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites', ...
-    'totalComputingTime','enable_metaplasticity','enable_inhplasticity', ...
+    'totalComputingTime','parsedParams', ...
     'spktimes_all','Ca_history','spikes_post', 'g_plas_history', ...
     'spikes_last5sec','rate_Output5','syn_decay_NMDA', ...
-    'EPSP_amplitude_norm', 'STOPPER', 'enable_inhdrive', 'EPSP_amplitude', ...
+    'EPSP_amplitude_norm', 'STOPPER', 'EPSP_amplitude', ...
     'f_history', 'spikes_binary', 'spiketimes', 's', 'InputBool', ...
     'VRest_history', 'gExc_history');
 fprintf('Successfully wrote output to %s\n', filePath);
