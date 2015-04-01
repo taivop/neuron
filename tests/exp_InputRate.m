@@ -1,9 +1,9 @@
-inputFreqs = [0 7 20:10:60];
+inputFreqs = [2 7 10:10:60];
 meanWeights = [];
 outputFreqs = [];
 
-T_sec = 2; % seconds
-filename_base = 'inputrate_2004fig1c';
+T_sec = 20; % seconds
+filename_base = 'exp_inputrate_clus';
 
 cd ..;
 
