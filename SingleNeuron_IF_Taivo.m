@@ -29,7 +29,7 @@ EPSP_amplitude = 1;             % in mV, rough value
 
 %% Assign optional function argument values if any were given, otherwise use defaults
 p = inputParser;
-addParameter(p,'enable_metaplasticity',0);
+addParameter(p,'enable_metaplasticity',1);
 addParameter(p,'enable_inhplasticity',0);
 addParameter(p,'enable_inhdrive',1);
 addParameter(p,'enable_onlyoneinput',0);
