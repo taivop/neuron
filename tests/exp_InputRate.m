@@ -5,12 +5,15 @@ outputFreqs = [];
 T_sec = 20; % seconds
 filename_base = 'exp_inputrate_clus';
 
+enable_metaplasticity = 1;
+
 cd ..;
 
 for inputFreq = inputFreqs
     fprintf('----- RUNNING experiment with input freq %dHz -----\n', inputFreq);
     filename_spec = sprintf('%s-%dHz', filename_base,inputFreq);
-    filePath = SingleNeuron_IF_Taivo(T_sec,inputFreq,filename_spec);
+    filePath = SingleNeuron_IF_Taivo(T_sec,inputFreq,filename_spec ...
+        ,'enable_metaplasticity',enable_metaplasticity);
     
     load(filePath);
     
