@@ -29,7 +29,7 @@ for inputFreq = inputFreqs
     end;
     
     meanWeights = [meanWeights; avg];
-    outputFreqs = [outputFreqs rate_Output];
+    outputFreqs = [outputFreqs rate_Output5];
     fprintf('----- FINISHED experiment with input freq %dHz: mean weight is %.2f, output freq is %.0fHz  -----\n', inputFreq, avg, rate_Output);
 end;
 
