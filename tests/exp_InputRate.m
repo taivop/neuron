@@ -41,6 +41,6 @@ fileName = sprintf('res_InputRate_%s.mat', datestr(now,'yyyy-mm-dd_HH-MM-SS'));
 cd data_out;
 % Save all the relevant stuff
 
-save(fileName, 'inputFreqs', 'outputFreqs', 'meanWeights', 'T0', 'filename_base');
+save(fileName, 'inputFreqs', 'outputFreqs', 'meanWeights', 'T0', 'filename_base', 'enable_metaplasticity');
 fprintf('Successfully wrote output to %s\n', fileName);
 cd ..;
