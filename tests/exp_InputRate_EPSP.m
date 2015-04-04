@@ -7,7 +7,7 @@ function [] = exp_InputRate_EPSP(amp_index)
     meanWeights = [];
     outputFreqs = [];
 
-    T_sec = 1; % seconds
+    T_sec = 100; % seconds
     filename_base = sprintf('exp_inputrate_clus_amp-%.1f', amp);
     
     cd ..;
