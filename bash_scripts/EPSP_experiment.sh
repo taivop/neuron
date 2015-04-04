@@ -1,7 +1,5 @@
 #!/bin/bash
 
-cd ../tests
-
 # Take one node
 #SBATCH -N 1
 
