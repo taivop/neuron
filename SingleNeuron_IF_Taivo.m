@@ -24,8 +24,6 @@ SingleNeuron_IF_Taivo_Parameters_2004;
 T0 = T_sec * 1000;              % Simulation length in ms
 Tsim = T0/dt;                   % num of time steps
 I0 = 0.0;                       % Basal drive to pyramidal neurons (controls basal rate; 1.5 -> gamma freq (about 40-50 Hz) when isolated)
-EPSP_amplitude = 2;             % in mV, rough value
-
 
 %% Assign optional function argument values if any were given, otherwise use defaults
 p = inputParser;
@@ -37,6 +35,7 @@ addParameter(p,'enable_100x_speedup',1);
 addParameter(p,'enable_groupedinputs',0); % if enabled, input rate parameter only applies to inh inputs
 addParameter(p,'numDendrites',120);
 addParameter(p,'endExc',100);
+addParameter(p,'EPSP_amplitude', 1); % in mV, rough value
 
 parse(p, varargin{:});
 parsedParams = p.Results; % for saving
@@ -179,7 +178,7 @@ for t=1: Tsim                       % Loop over time
         s = zeros(size(InputBool));  % plays as external input drive
         
         STOPPER = 1;
-        EPSP_amplitude_norm = EPSP_amplitude / 2; % we use this to scale EPSP amplitude to desired value
+        EPSP_amplitude_norm = p.Results.EPSP_amplitude / 2.6; % we use this to scale EPSP amplitude to desired value
         
         s(rE,1) = s_lastE + dt*(((1+tanh(V_Input(rE,1)/10))/2).*(1- STOPPER * s_lastE)/tau_R_E -s_lastE/tau_D_E);
         s(rI,1) = s_lastI + dt*(((1+tanh(V_Input(rI,1)/10))/2).*(1- STOPPER * s_lastI)/tau_R_I -s_lastI/tau_D_I);
@@ -329,7 +328,7 @@ save(filePath, 'rate_Input', 'rate_Output','T0','dt','I0','gExcMax','gInhMax', .
     'totalComputingTime','parsedParams', ...
     'spktimes_all','Ca_history','spikes_post', 'g_plas_history', ...
     'spikes_last5sec','rate_Output5','syn_decay_NMDA', ...
-    'EPSP_amplitude_norm', 'STOPPER', 'EPSP_amplitude', ...
+    'EPSP_amplitude_norm', 'STOPPER', ...
     'f_history', 'spikes_binary', 'spiketimes', 's', 'InputBool', ...
     'VRest_history', 'gExc_history');
 fprintf('Successfully wrote output to %s\n', filePath);
