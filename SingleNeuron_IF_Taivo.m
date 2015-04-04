@@ -24,7 +24,7 @@ SingleNeuron_IF_Taivo_Parameters_2004;
 T0 = T_sec * 1000;              % Simulation length in ms
 Tsim = T0/dt;                   % num of time steps
 I0 = 0.0;                       % Basal drive to pyramidal neurons (controls basal rate; 1.5 -> gamma freq (about 40-50 Hz) when isolated)
-EPSP_amplitude = 1;             % in mV, rough value
+EPSP_amplitude = 2;             % in mV, rough value
 
 
 %% Assign optional function argument values if any were given, otherwise use defaults
@@ -34,6 +34,7 @@ addParameter(p,'enable_inhplasticity',0);
 addParameter(p,'enable_inhdrive',1);
 addParameter(p,'enable_onlyoneinput',0);
 addParameter(p,'enable_100x_speedup',1);
+addParameter(p,'enable_groupedinputs',0); % if enabled, input rate parameter only applies to inh inputs
 addParameter(p,'numDendrites',120);
 addParameter(p,'endExc',100);
 
@@ -135,9 +136,13 @@ for t=1: Tsim                       % Loop over time
         
         
         % Generate input spikes
-
-        [spikes_binary, spiketimes] = GenerateInputSpikesUncorrelated(endExc, rate_Input, 1000, dt, 0);
-        [spikes_binary2, spiketimes2] = GenerateInputSpikesUncorrelated(numDendrites-endExc, rate_Input, 1000, dt, 0);
+        if p.Results.enable_groupedinputs
+            [spikes_binary, spiketimes] = GenerateInputSpikesGroups(1000, dt, 0);
+        else
+            [spikes_binary, spiketimes] = GenerateInputSpikesUncorrelated(endExc, rate_Input, 1000, dt, 0);
+        end;
+        
+        [spikes_binary2, spiketimes2] = GenerateInputSpikesUncorrelated(numDendrites-endExc, rate_Input, 1000, dt, 0);            
         
         fprintf('             measured total input rate: %.0fHz\n', sum(sum(spiketimes ~= 0)));
         %fprintf('             measured total output rate: %.0fHz\n', sum(sum(spiketimes ~= 0)));
