@@ -5,7 +5,7 @@
 function [spikes_binary, spiketimes] = GenerateInputSpikesGroups(T0, dt, fileName)
 
     [b1, t1] = GenerateInputSpikesUncorrelated(25, 40, T0, dt, '');
-    [b2, t2] = GenerateInputSpikesMacke(75, 10, T0, dt, '');
+    [b2, t2] = GenerateInputSpikesUncorrelated(75, 10, T0, dt, '');
 
     spikes_binary = vertcat(b1, b2);
 
@@ -21,8 +21,6 @@ function [spikes_binary, spiketimes] = GenerateInputSpikesGroups(T0, dt, fileNam
     end;
 
     spiketimes = vertcat(t1, t2);
-end;
-
 end
 
 
