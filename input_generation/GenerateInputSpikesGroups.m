@@ -1,15 +1,11 @@
 % Generatesz two groups of trains.
-% 1st group (1/2 of all synapses) gets 2 times the input rate as the 2nd.
+% 1st group (25 synapses) gets 40Hz input, the 2nd group (75 synapses) gets
+% 10Hz.
 
-function [spikes_binary, spiketimes] = GenerateInputSpikesGroups(nrSpikeTrains, rate_per_syn, c, T0, dt, fileName)
+function [spikes_binary, spiketimes] = GenerateInputSpikesGroups(T0, dt, fileName)
 
-if nrSpikeTrains == 1
-    [spikes_binary, spiketimes] = GenerateInputSpikesMacke(nrSpikeTrains, rate_per_syn, c, T0, dt, fileName);
-else
-    nrTrainsInGroup1 = round(nrSpikeTrains / 2);
-
-    [b1, t1] = GenerateInputSpikesMacke(nrTrainsInGroup1, rate_per_syn * 4, c, T0, dt, '');
-    [b2, t2] = GenerateInputSpikesMacke(nrSpikeTrains - nrTrainsInGroup1, rate_per_syn, c, T0, dt, '');
+    [b1, t1] = GenerateInputSpikesUncorrelated(25, 40, T0, dt, '');
+    [b2, t2] = GenerateInputSpikesMacke(75, 10, T0, dt, '');
 
     spikes_binary = vertcat(b1, b2);
 
