@@ -2,7 +2,7 @@ inputFreqs = [2 7 10:10:60];
 meanWeights = [];
 outputFreqs = [];
 
-T_sec = 20; % seconds
+T_sec = 100; % seconds
 filename_base = 'exp_inputrate_clus';
 
 enable_metaplasticity = 1;
