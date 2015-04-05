@@ -10,13 +10,13 @@
 #SBATCH --mem=16000
 
 # Set walltime
-#SBATCH -t 03:00:00
+#SBATCH -t 00:00:30
 
 # Set queue
 #SBATCH -p testing
 
 # Set array of amp indexes
-#SBATCH --array=8-9
+#SBATCH --array=1-9
 
 srun sh single_EPSP_iocurve.sh
 
