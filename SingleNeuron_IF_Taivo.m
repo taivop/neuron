@@ -50,7 +50,7 @@ if p.Results.enable_onlyoneinput
 end;
 if p.Results.enable_100x_speedup
     eta_slope = eta_slope * 100;
-    %syn_decay_NMDA = syn_decay_NMDA * 100;
+    syn_decay_NMDA = syn_decay_NMDA * 100;
     stab.k_minus = 100 * stab.k_minus;
     stab.k_plus = 100 * stab.k_plus;
 end;
@@ -104,6 +104,9 @@ g_plas_history = [];
 VRest_history = [];
 gExc_history = [];
 g_NMDA_history = [];
+I_NMDA_history = [];
+V_BPAP_history = [];
+H_history = [];
 
 % Initialisations for some loop internal variables
 spikes_post=[];                                 % Output spike times
@@ -133,7 +136,6 @@ for t=1: Tsim                       % Loop over time
     if (mod(t, timesteps_in_1sec)==1)
         fprintf('t = %5dms, mean exc weight %.2f\n',largebin * 1000 + t_inner, mean(g_plas(rE)));
         g_plas_history = [g_plas_history g_plas];
-        
         
         % Generate input spikes
         if p.Results.enable_groupedinputs
@@ -259,7 +261,7 @@ for t=1: Tsim                       % Loop over time
           
           V_BPAP = sum(kernel_BPAP);
           V_H = VRestChanging + V_BPAP;                              % Magnesium unblocking caused by BPAP
-          H = Mg_block(V_H) * (V - NMDA.Ca_Vrest);
+          H = Mg_block(V_H) * (NMDA.Ca_Vrest - V_H);
           
           % ---START former loop
           t_kernel_f_NMDA = (t - spktimes_all) .* (spktimes_all>0 & spktimes_all<t & spktimes_all>(t-val));
@@ -268,7 +270,8 @@ for t=1: Tsim                       % Loop over time
           tauf(tauf==0) = -Inf;
           taus(taus==0) = -Inf;
           f = sum(NMDA.I_f*exp(tauf)+NMDA.I_s*exp(taus),2);
-          f_history = [f_history f(1)];
+          %f_history = [f_history f(1)];
+          %H_history = [H_history H];
           I_NMDA = (g_NMDA*f*H);
           % ---END former loop
           
@@ -295,9 +298,10 @@ for t=1: Tsim                       % Loop over time
           end;
               
           Ca_history = [Ca_history Ca(1)];
-          VRest_history = [VRest_history VRestChanging];
+          %VRest_history = [VRest_history VRestChanging];
           gExc_history = [gExc_history gExc];
-          
+          %V_BPAP_history = [V_BPAP_history V_BPAP];          
+          %I_NMDA_history = [I_NMDA_history I_NMDA];
     
 end
 disp('Main loop done.');
@@ -327,10 +331,10 @@ end;
 % Save all the relevant stuff
 save(filePath, 'rate_Input', 'rate_Output','T0','dt','I0','gExcMax','gInhMax', ...
     'Vmat','g_plas0','g_plas','rE','rI','endExc','startInh','numDendrites', ...
-    'totalComputingTime','parsedParams', ...
+    'totalComputingTime','parsedParams', 'V_BPAP_history', ...
     'spktimes_all','Ca_history','spikes_post', 'g_plas_history', ...
-    'spikes_last5sec','rate_Output5','syn_decay_NMDA', ...
+    'spikes_last5sec','rate_Output5','syn_decay_NMDA', 'H_history', ...
     'EPSP_amplitude_norm', 'STOPPER', 'g_NMDA_history', ...
     'f_history', 'spikes_binary', 'spiketimes', 's', 'InputBool', ...
-    'VRest_history', 'gExc_history', 'stab');
+    'VRest_history', 'gExc_history', 'stab', 'I_NMDA_history');
 fprintf('Successfully wrote output to %s\n', filePath);

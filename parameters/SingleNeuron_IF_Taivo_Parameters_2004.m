@@ -67,7 +67,7 @@ learn_curve.alfa2 = 0.55;	   % #AR0.4  | 2002 0.55
 learn_curve.beta2 = 80;		   % #AR20   | 2002 80
 
 %% Metaplasticity
-stab.gt = - 0.5 * 4.5e-3;		% #AR0.5*4.5e-3 (probably) Starting value for g_NMDA. Is already multiplied with P0 (which is 0.5). Was 4.5e-3 previously.
+stab.gt = 0.5 * 4.5e-3;		    % #AR0.5*4.5e-3 (probably) Starting value for g_NMDA. Is already multiplied with P0 (which is 0.5). Was 4.5e-3 previously.
 stab.k_minus = 8e-9;            % #AR8e-9
 stab.k_plus = 8e-7;             % #AR8e-7
 
