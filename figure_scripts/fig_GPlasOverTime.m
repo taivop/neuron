@@ -1,8 +1,8 @@
-function [] = fig_GPlasOverTime(g_plas_history)
+function [f] = fig_GPlasOverTime(g_plas_history)
 
 
 ymax = max(max(g_plas_history)) .* 1.05;
-figure;
+f = figure;
 
 t = annotation('textbox',[0 0 0.1 0.1],'string','0');
 

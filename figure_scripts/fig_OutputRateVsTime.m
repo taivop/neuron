@@ -1,8 +1,8 @@
-function [] = FigWeightHistograms(spikes_post, rate_Input, T0, dt, I0)
+function [f] = FigWeightHistograms(spikes_post, rate_Input, T0, dt, I0)
 
 %% Plot Figure 3: Output frequency evolving in time
 
-figure();
+f = figure();
 
 
 

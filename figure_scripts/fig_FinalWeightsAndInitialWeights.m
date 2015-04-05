@@ -1,6 +1,6 @@
-function [] = fig_FinalWeightsVsDifferentInitialWeights(initialWeights, finalWeights)
+function [f] = fig_FinalWeightsVsDifferentInitialWeights(initialWeights, finalWeights)
 
-figure();
+f = figure();
 hold on;
 
 colours = ['y','m','c','r','g','b','w','k'];

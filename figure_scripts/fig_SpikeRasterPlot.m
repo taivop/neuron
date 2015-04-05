@@ -1,4 +1,4 @@
-function [] = fig_SpikeRasterPlot(spiketimes)
+function [f] = fig_SpikeRasterPlot(spiketimes)
 % Turn spike time matrix into boolean matrix and plot
 
 spiketimes = round(spiketimes);
@@ -14,7 +14,7 @@ for i=1:size(spiketimes,1)
     
 end;
 
-imagesc(spikebool);
+f = imagesc(spikebool);
 colormap(flipud(gray));
 
 xlabel('Timestep');

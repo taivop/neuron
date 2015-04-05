@@ -1,4 +1,4 @@
-function [] = OmegaShape()
+function [f] = OmegaShape()
 calciums = 0:0.01:1;
 omegas = [];
 
@@ -14,7 +14,7 @@ for Ca = calciums
     omegas = [omegas; omega];   
 end;
 
-figure();
+f = figure();
 plot([0 1], [0.25 0.25], 'k--');
 hold on;
 plot(calciums,omegas,'r-');

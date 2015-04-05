@@ -1,7 +1,7 @@
-function [] = fig_OutputRateVsInputRate(inputs, outputs)
+function [f] = fig_OutputRateVsInputRate(inputs, outputs)
 
 
-figure();
+f = figure();
 
 plot(inputs, outputs, ...
     'Color','black','Marker','.','MarkerSize',15.0,'LineStyle','-','LineWidth',1.5);

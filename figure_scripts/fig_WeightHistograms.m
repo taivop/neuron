@@ -1,7 +1,7 @@
-function [] = FigWeightHistograms(gExc, gInh, g_plas0, g_plas, rE, rI)
+function [f] = FigWeightHistograms(gExc, gInh, g_plas0, g_plas, rE, rI)
 
 %% Plot Figure 2: weight histograms
-figure();
+f = figure();
 
 subplot(2,2,1)
 dat = gExc*g_plas0(rE);

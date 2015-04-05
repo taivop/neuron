@@ -1,11 +1,11 @@
-function [] = fig_WeightHistogramsImpl(g_plas0,g_plas)
+function [f] = fig_WeightHistogramsImpl(g_plas0,g_plas)
 SingleNeuron_IF_Taivo_Parameters;
 
 rE = 1:100;
 rI = 101:120;
 
 
-figure();
+f = figure();
 
 subplot(2,2,1)
 dat = g_plas0(rE);

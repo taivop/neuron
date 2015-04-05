@@ -1,4 +1,4 @@
-function [] = EtaShape()
+function [f] = EtaShape()
 calciums = 0:0.01:1;
 etas = [];
 
@@ -10,7 +10,7 @@ for Ca = calciums
     etas = [etas; eta];
 end;
 
-figure();
+f = figure();
 plot(calciums,etas,'r-');
 
 title('\eta');

@@ -1,7 +1,7 @@
-function [] = FigSpiketrainsAndVoltage(InputBool, Vmat, nrExc, nrInh, rate_Input, T0, dt, I0)
+function [f] = FigSpiketrainsAndVoltage(InputBool, Vmat, nrExc, nrInh, rate_Input, T0, dt, I0)
 
 %% Plot Figure 1: input spike trains and output voltage
-figure();
+f = figure();
 
 subplot(2,1,1)
 imagesc(InputBool)

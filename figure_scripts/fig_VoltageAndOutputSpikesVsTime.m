@@ -1,6 +1,6 @@
-function [] = fig_VoltageAndSpikesVsTime(Vmat, spikes_post)
+function [f] = fig_VoltageAndSpikesVsTime(Vmat, spikes_post)
 
-figure;
+f = figure;
 hold on;
 
 y=[-100,40];
