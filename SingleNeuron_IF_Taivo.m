@@ -103,6 +103,7 @@ f_history = [];
 g_plas_history = [];
 VRest_history = [];
 gExc_history = [];
+g_NMDA_history = [];
 
 % Initialisations for some loop internal variables
 spikes_post=[];                                 % Output spike times
@@ -280,6 +281,7 @@ for t=1: Tsim                       % Loop over time
           g_plas = g_plas + dt*(eta_val.*(omega-syn_decay_NMDA*g_plas));
                     
           % Synaptic stabilization aka metaplasticity
+          g_NMDA_history = [g_NMDA_history g_NMDA];
           if p.Results.enable_metaplasticity  
             g_NMDA = g_NMDA + dt*(-(stab.k_minus*(V_H-VRestChanging).^2 + stab.k_plus).*g_NMDA + stab.k_plus*stab.gt);
           end;
