@@ -35,7 +35,7 @@ addParameter(p,'enable_100x_speedup',1);
 addParameter(p,'enable_groupedinputs',0); % if enabled, input rate parameter only applies to inh inputs
 addParameter(p,'numDendrites',120);
 addParameter(p,'endExc',100);
-addParameter(p,'EPSP_amplitude', 1); % in mV, rough value
+addParameter(p,'EPSP_amplitude', 3); % in mV, rough value
 
 parse(p, varargin{:});
 parsedParams = p.Results; % for saving
