@@ -1,6 +1,6 @@
 function [] = exp_InputRate_EPSP(amp_index)
 
-    amplitudes = [0.1 0.5 1 2 3 5 10];
+    amplitudes = [0.1 0.5 1 2 3 5 10 15 20];
     amp = amplitudes(amp_index);
 
     inputFreqs = [2 7 10:10:60];
