@@ -16,9 +16,8 @@
 #SBATCH -p testing
 
 # Set array of amp indexes
-#SBATCH --array=1-7
+#SBATCH --array=8-9
 
-# amp indexes 1-7
 srun sh single_EPSP_iocurve.sh
 
 exit
