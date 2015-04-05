@@ -50,7 +50,7 @@ if p.Results.enable_onlyoneinput
 end;
 if p.Results.enable_100x_speedup
     eta_slope = eta_slope * 100;
-    syn_decay_NMDA = syn_decay_NMDA * 100;
+    %syn_decay_NMDA = syn_decay_NMDA * 100;
     stab.k_minus = 100 * stab.k_minus;
     stab.k_plus = 100 * stab.k_plus;
 end;
@@ -69,7 +69,7 @@ fprintf('100x speedup enabled: %d\n', p.Results.enable_100x_speedup);
 V = VRest + 0*10*rand(1);             % Initial postsynaptic voltage
 
 % Initialise weights with some randomness
-initialWeightExc = 2;
+initialWeightExc = 1;
 initialWeightInh = 1;
 weight_randomness = rand(size(rE)) * 0.10 - 0.05;
 
@@ -330,7 +330,7 @@ save(filePath, 'rate_Input', 'rate_Output','T0','dt','I0','gExcMax','gInhMax', .
     'totalComputingTime','parsedParams', ...
     'spktimes_all','Ca_history','spikes_post', 'g_plas_history', ...
     'spikes_last5sec','rate_Output5','syn_decay_NMDA', ...
-    'EPSP_amplitude_norm', 'STOPPER', ...
+    'EPSP_amplitude_norm', 'STOPPER', 'g_NMDA_history', ...
     'f_history', 'spikes_binary', 'spiketimes', 's', 'InputBool', ...
     'VRest_history', 'gExc_history', 'stab');
 fprintf('Successfully wrote output to %s\n', filePath);
