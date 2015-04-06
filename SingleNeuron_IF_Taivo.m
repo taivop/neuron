@@ -139,7 +139,7 @@ for t=1: Tsim                       % Loop over time
         
         % Generate input spikes
         if p.Results.enable_groupedinputs
-            [spikes_binary, spiketimes] = GenerateInputSpikesGroupsStochastic(1000, dt, 0);
+            [spikes_binary, spiketimes] = GenerateInputSpikesGroupsCorrelated(10, 0.8, 1000, dt, 0);
         else
             [spikes_binary, spiketimes] = GenerateInputSpikesUncorrelated(endExc, rate_Input, 1000, dt, 0);
         end;
