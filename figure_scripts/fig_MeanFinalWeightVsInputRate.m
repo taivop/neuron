@@ -6,7 +6,7 @@ f = figure();
 plot(inputFreqs, meanWeights, ...
     'Color','black','Marker','.','MarkerSize',15.0,'LineStyle','-','LineWidth',1.5);
 
-xlabel('Mean input activity (Hz)');
-ylabel('Mean final weight');
+xlabel('mean input activity (Hz)');
+ylabel('mean final weight');
 
 title('Mean final weight');
