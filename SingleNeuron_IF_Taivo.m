@@ -52,7 +52,7 @@ if p.Results.enable_onlyoneinput
 end;
 if p.Results.enable_100x_speedup
     eta_slope = eta_slope * 100;
-    %syn_decay_NMDA = syn_decay_NMDA * 100;
+    syn_decay_NMDA = syn_decay_NMDA * 100;
     stab.k_minus = 100 * stab.k_minus;
     stab.k_plus = 100 * stab.k_plus;
 end;
