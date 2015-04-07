@@ -272,7 +272,7 @@ for t=1: Tsim                       % Loop over time
           f = sum(NMDA.I_f*exp(tauf)+NMDA.I_s*exp(taus),2);
           %f_history = [f_history f(1)];
           %H_history = [H_history H];
-          I_NMDA = (g_NMDA*f*H);
+          I_NMDA = NMDA.P0 * (g_NMDA*f*H);
           % ---END former loop
           
           % Learning curve and slope

@@ -53,6 +53,7 @@ NMDA.I_f = 0.7;                % #AR0.7 Relative magnitude fast component NMDA c
 NMDA.I_s = 0.3;                % #AR0.3 Relative magnitude slow component NMDA conductance
 NMDA.tau_f = 50;               % #AR50 Time constant fast component (in ms)
 NMDA.tau_s = 200;              % #AR200 Time constant slow component (in ms)
+NMDA.P0 = 0.5;                 % #AR0.5 Fraction of NMDARs shifting to open state.
 
 %% Calcium dynamics
 Ca_tau = 20;                   % #AR20 Calcium passive decay time constant (in ms)
@@ -67,7 +68,7 @@ learn_curve.alfa2 = 0.55;	   % #AR0.4  | 2002 0.55
 learn_curve.beta2 = 80;		   % #AR20   | 2002 80
 
 %% Metaplasticity
-stab.gt = 0.5 * 4.5e-3;		    % #AR0.5*4.5e-3 (probably) Starting value for g_NMDA. Is already multiplied with P0 (which is 0.5). Was 4.5e-3 previously.
+stab.gt = 4.5e-3;       	    % #AR4.5e-3 Starting value for g_NMDA.
 stab.k_minus = 8e-9;            % #AR8e-9
 stab.k_plus = 8e-7;             % #AR8e-7
 
