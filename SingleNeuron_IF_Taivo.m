@@ -36,6 +36,8 @@ addParameter(p,'enable_groupedinputs',0); % if enabled, input rate parameter onl
 addParameter(p,'numDendrites',120);
 addParameter(p,'endExc',100);
 addParameter(p,'EPSP_amplitude', 3); % in mV, rough value
+addParameter(p,'initialWeightExc', 2);
+addParameter(p,'initialWeightInh', 1);
 
 parse(p, varargin{:});
 parsedParams = p.Results; % for saving
@@ -50,7 +52,7 @@ if p.Results.enable_onlyoneinput
 end;
 if p.Results.enable_100x_speedup
     eta_slope = eta_slope * 100;
-    syn_decay_NMDA = syn_decay_NMDA * 100;
+    %syn_decay_NMDA = syn_decay_NMDA * 100;
     stab.k_minus = 100 * stab.k_minus;
     stab.k_plus = 100 * stab.k_plus;
 end;
@@ -68,11 +70,6 @@ fprintf('100x speedup enabled: %d\n', p.Results.enable_100x_speedup);
 %% Initializations
 V = VRest + 0*10*rand(1);             % Initial postsynaptic voltage
 
-% Initialise weights with some randomness
-initialWeightExc = 1;
-initialWeightInh = 1;
-weight_randomness = rand(size(rE)) * 0.10 - 0.05;
-
 % Some parameters to describe how open the gates are		
 myPyrGatingFuns = makePyrGatingFuns;		
 aM = myPyrGatingFuns.alphaM_P(V);		
@@ -87,9 +84,12 @@ n = 0.040275499396172;
 
 % g_plas are the coefficients we use to get conductivities from their base values.
 % They are named 'w' in the article.
+% Initialise weights with some randomness
+weight_randomness = rand(size(rE)) * 0.10 - 0.05;
+
 g_plas = ones(numDendrites, 1);
-g_plas(rE) = (g_plas(rE) + weight_randomness) * initialWeightExc;
-g_plas(rI) = g_plas(rI) * initialWeightInh;
+g_plas(rE) = (g_plas(rE) + weight_randomness) * p.Results.initialWeightExc;
+g_plas(rI) = g_plas(rI) * p.Results.initialWeightInh;
 if p.Results.enable_onlyoneinput
     g_plas(2:end) = 0;
 end;
@@ -290,15 +290,15 @@ for t=1: Tsim                       % Loop over time
           end;
           
           if ~p.Results.enable_inhplasticity
-            g_plas(startInh:numDendrites) = initialWeightInh;  % Remove plasticity from inh synapses
+            g_plas(startInh:numDendrites) = p.Results.initialWeightInh;  % Remove plasticity from inh synapses
           end;
           
           if p.Results.enable_onlyoneinput
               g_plas(2:end) = 0;
           end;
               
-          Ca_history = [Ca_history Ca(1)];
-          %VRest_history = [VRest_history VRestChanging];
+          %Ca_history = [Ca_history Ca(1)];
+          VRest_history = [VRest_history VRestChanging];
           gExc_history = [gExc_history gExc];
           %V_BPAP_history = [V_BPAP_history V_BPAP];          
           %I_NMDA_history = [I_NMDA_history I_NMDA];
