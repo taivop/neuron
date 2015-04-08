@@ -169,8 +169,9 @@ for t=1: Tsim                       % Loop over time
             spktimes_new = spktimes;
             spktimes_all = spktimes_new;
         else
-            spktimes_all = [spktimes_new (spktimes + timesteps_in_1sec * largebin)];
-            spktimes_new = spktimes + timesteps_in_1sec * largebin;
+            % Only add these spikes into spktimes_all that have nonzero spiketimes
+            spktimes_all = [spktimes_new (spktimes > 0) .* (spktimes + timesteps_in_1sec * largebin)];
+            spktimes_new = (spktimes > 0) .* (spktimes + timesteps_in_1sec * largebin);
         end;
         %-- input spikes generated
         
