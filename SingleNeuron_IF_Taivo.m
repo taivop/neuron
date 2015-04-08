@@ -39,19 +39,21 @@ addParameter(p,'endExc',100);
 addParameter(p,'EPSP_amplitude', 3); % in mV, rough value
 addParameter(p,'initialWeightExc', 2);
 addParameter(p,'initialWeightInh', 1);
+addParameter(p,'STDP_deltaT', NaN);
 
 parse(p, varargin{:});
 parsedParams = p.Results; % for saving
 
-numDendrites = p.Results.numDendrites;
-endExc = p.Results.endExc;
+numDendrites = parsedParams.numDendrites;
+endExc = parsedParams.endExc;
 
 %% Change parameters based on options given
-if p.Results.enable_onlyoneinput
+if parsedParams.enable_onlyoneinput
     numDendrites = 2;
     endExc = 1;
+    parsedParams.enable_inhdrive = 0;
 end;
-if p.Results.enable_100x_speedup
+if parsedParams.enable_100x_speedup
     eta_slope = eta_slope * 100;
     syn_decay_NMDA = syn_decay_NMDA * 100;
     stab.k_minus = 100 * stab.k_minus;
@@ -66,7 +68,7 @@ rI = (startInh:numDendrites)';      % Inhibitory synapses
 fprintf('Simulation time: %ds\n', T_sec);
 fprintf('lambda = %.3f\n', syn_decay_NMDA);
 fprintf('desired correlation = %.2f\n', desiredCorrelation);
-fprintf('100x speedup enabled: %d\n', p.Results.enable_100x_speedup);
+fprintf('100x speedup enabled: %d\n', parsedParams.enable_100x_speedup);
 
 %% Initializations
 V = VRest + 0*10*rand(1);             % Initial postsynaptic voltage
@@ -89,9 +91,9 @@ n = 0.040275499396172;
 weight_randomness = rand(size(rE)) * 0.10 - 0.05;
 
 g_plas = ones(numDendrites, 1);
-g_plas(rE) = (g_plas(rE) + weight_randomness) * p.Results.initialWeightExc;
-g_plas(rI) = g_plas(rI) * p.Results.initialWeightInh;
-if p.Results.enable_onlyoneinput
+g_plas(rE) = (g_plas(rE) + weight_randomness) * parsedParams.initialWeightExc;
+g_plas(rI) = g_plas(rI) * parsedParams.initialWeightInh;
+if parsedParams.enable_onlyoneinput
     g_plas(2:end) = 0;
 end;
 g_plas0 = g_plas;                               % Save initial values
@@ -139,10 +141,12 @@ for t=1: Tsim                       % Loop over time
         g_plas_history = [g_plas_history g_plas];
         
         % Generate input spikes
-        if p.Results.enable_groupedinputs
+        if parsedParams.enable_groupedinputs
             [spikes_binary, spiketimes] = GenerateInputSpikesGroupsCorrelated(10, 0.8, 1000, dt, 0);
-        elseif p.Results.enable_manualinputs
+        elseif parsedParams.enable_manualinputs
             [spikes_binary, spiketimes] = GenerateInputSpikesManual(100, 1000, dt, 0);
+        elseif ~isnan(parsedParams.STDP_deltaT)
+            [spikes_binary, spiketimes] = GenerateInputSpikesSTDP(endExc, parsedParams.STDP_deltaT, 1000, dt, 0);
         else
             [spikes_binary, spiketimes] = GenerateInputSpikesUncorrelated(endExc, rate_Input, 1000, dt, 0);
         end;
@@ -184,7 +188,7 @@ for t=1: Tsim                       % Loop over time
         s = zeros(size(InputBool));  % plays as external input drive
         
         STOPPER = 1;
-        EPSP_amplitude_norm = p.Results.EPSP_amplitude / 2.6; % we use this to scale EPSP amplitude to desired value
+        EPSP_amplitude_norm = parsedParams.EPSP_amplitude / 2.6; % we use this to scale EPSP amplitude to desired value
         
         s(rE,1) = s_lastE + dt*(((1+tanh(V_Input(rE,1)/10))/2).*(1- STOPPER * s_lastE)/tau_R_E -s_lastE/tau_D_E);
         s(rI,1) = s_lastI + dt*(((1+tanh(V_Input(rI,1)/10))/2).*(1- STOPPER * s_lastI)/tau_R_I -s_lastI/tau_D_I);
@@ -209,7 +213,7 @@ for t=1: Tsim                       % Loop over time
                 gExc = gExcMax * g_plas(rE)'*s(rE,t_inner)*EPSP_amplitude_norm;
                 gInh = gInhMax * g_plas(rI)'*s(rI,t_inner)*EPSP_amplitude_norm;
                 
-                if ~p.Results.enable_inhdrive
+                if ~parsedParams.enable_inhdrive
                     gInh = zeros(size(gInh));
                 end;
                
@@ -240,6 +244,15 @@ for t=1: Tsim                       % Loop over time
                  V = V + dt * (gNa*m .^3.*h.*(VNa-V) ...
                        + gK*n.^4.*(VK-V) + gLeak*(VRestChanging-V) + I0 ...		
                        + gInh.*(VIn-V) + gExc.*(VEx-V));
+                   
+                 % For running STDP experiments
+                 if ~isnan(parsedParams.STDP_deltaT)
+                     if t_inner==500
+                         V = V_sp_thres + 1;
+                     else
+                         V = VRestChanging;
+                     end;
+                 end;
                    
                 % Euler update for m, h, n 
                 m = m + dt*(aM.*(1-m) - bM.*m);
@@ -273,8 +286,8 @@ for t=1: Tsim                       % Loop over time
           tauf(tauf==0) = -Inf;
           taus(taus==0) = -Inf;
           f = sum(NMDA.I_f*exp(tauf)+NMDA.I_s*exp(taus),2);
-          %f_history = [f_history f(1)];
-          %H_history = [H_history H];
+          f_history = [f_history f(1)];
+          H_history = [H_history H];
           I_NMDA = NMDA.P0 * (g_NMDA*f*H);
           % ---END former loop
           
@@ -288,23 +301,23 @@ for t=1: Tsim                       % Loop over time
                     
           % Synaptic stabilization aka metaplasticity
           g_NMDA_history = [g_NMDA_history g_NMDA];
-          if p.Results.enable_metaplasticity  
+          if parsedParams.enable_metaplasticity  
             g_NMDA = g_NMDA + dt*(-(stab.k_minus*(V_H-VRestChanging).^2 + stab.k_plus).*g_NMDA + stab.k_plus*stab.gt);
           end;
           
-          if ~p.Results.enable_inhplasticity
-            g_plas(startInh:numDendrites) = p.Results.initialWeightInh;  % Remove plasticity from inh synapses
+          if ~parsedParams.enable_inhplasticity
+            g_plas(startInh:numDendrites) = parsedParams.initialWeightInh;  % Remove plasticity from inh synapses
           end;
           
-          if p.Results.enable_onlyoneinput
+          if parsedParams.enable_onlyoneinput
               g_plas(2:end) = 0;
           end;
-              
-          %Ca_history = [Ca_history Ca(1)];
+          
+          Ca_history = [Ca_history Ca(1)];
           VRest_history = [VRest_history VRestChanging];
           gExc_history = [gExc_history gExc];
-          %V_BPAP_history = [V_BPAP_history V_BPAP];          
-          %I_NMDA_history = [I_NMDA_history I_NMDA];
+          V_BPAP_history = [V_BPAP_history V_BPAP];          
+          I_NMDA_history = [I_NMDA_history I_NMDA];
     
 end
 disp('Main loop done.');
