@@ -15,7 +15,7 @@ spikes_binary = zeros(nrSpikeTrains, T0/dt);
 spiketimes = [];
 
 % Build spiketimes matrix
-spiketimes = [spiketimes ones(nrSpikeTrains,1) * 500];
+spiketimes = [spiketimes ones(nrSpikeTrains,1) * 0];
 
 % Round spiketimes to nearest timebin
 spiketimes = round(spiketimes);
