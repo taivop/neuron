@@ -282,8 +282,8 @@ for t=1: Tsim                       % Loop over time
           
           % ---START former loop
           t_kernel_f_NMDA = (t - spktimes_all) .* (spktimes_all>0 & spktimes_all<t & spktimes_all>(t-val));
-          tauf = -t_kernel_f_NMDA./(NMDA.tau_f / dt);
-          taus = -t_kernel_f_NMDA./(NMDA.tau_s / dt);
+          tauf = -t_kernel_f_NMDA./(NMDA.tau_f);
+          taus = -t_kernel_f_NMDA./(NMDA.tau_s);
           tauf(tauf==0) = -Inf;
           taus(taus==0) = -Inf;
           f = NMDA.P0 * sum(NMDA.I_f*exp(tauf)+NMDA.I_s*exp(taus),2);
