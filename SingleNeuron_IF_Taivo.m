@@ -33,6 +33,7 @@ addParameter(p,'enable_inhdrive',1);
 addParameter(p,'enable_onlyoneinput',0);
 addParameter(p,'enable_100x_speedup',1);
 addParameter(p,'enable_groupedinputs',0); % if enabled, input rate parameter only applies to inh inputs
+addParameter(p,'enable_manualinputs', 0);
 addParameter(p,'numDendrites',120);
 addParameter(p,'endExc',100);
 addParameter(p,'EPSP_amplitude', 3); % in mV, rough value
@@ -140,6 +141,8 @@ for t=1: Tsim                       % Loop over time
         % Generate input spikes
         if p.Results.enable_groupedinputs
             [spikes_binary, spiketimes] = GenerateInputSpikesGroupsCorrelated(10, 0.8, 1000, dt, 0);
+        elseif p.Results.enable_manualinputs
+            [spikes_binary, spiketimes] = GenerateInputSpikesManual(100, 1000, dt, 0);
         else
             [spikes_binary, spiketimes] = GenerateInputSpikesUncorrelated(endExc, rate_Input, 1000, dt, 0);
         end;
