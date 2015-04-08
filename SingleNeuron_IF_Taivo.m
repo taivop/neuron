@@ -248,7 +248,7 @@ for t=1: Tsim                       % Loop over time
                    
                  % For running STDP experiments
                  if ~isnan(parsedParams.STDP_deltaT)
-                     if t_inner==500
+                     if t_inner==5000
                          V = V_sp_thres + 1;
                      else
                          V = VRestChanging;
