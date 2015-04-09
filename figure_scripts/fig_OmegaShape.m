@@ -10,7 +10,7 @@ omegas = [];
 SingleNeuron_IF_Taivo_Parameters_2004;
 
 for Ca = calciums
-    omega = learning_curve2002(learn_curve,Ca);
+    omega = learning_curve2004(learn_curve,Ca);
     omegas = [omegas; omega];   
 end;
 
@@ -25,3 +25,5 @@ ylabel('\Omega')
 
 xlim([0 1])
 ylim([-0.2 1.2])
+
+hold off;
