@@ -15,7 +15,7 @@ for Ca = calciums
 end;
 
 f = figure();
-plot([0 1], [0.25 0.25], 'k--');
+plot([0 1], [0.5 0.5], 'k--');
 hold on;
 plot(calciums,omegas,'r-');
 
