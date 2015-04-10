@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd ../fig3c
+cd ../tests
 
 # Take one node
 #SBATCH -N 1
@@ -12,7 +12,7 @@ cd ../fig3c
 #SBATCH --mem=16000
 
 # Set walltime
-#SBATCH -t 01:00:00
+#SBATCH -t 02:30:00
 
 # Set queue
 #SBATCH -p testing
