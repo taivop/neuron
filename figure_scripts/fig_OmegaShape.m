@@ -10,12 +10,12 @@ omegas = [];
 SingleNeuron_IF_Taivo_Parameters_2004;
 
 for Ca = calciums
-    omega = learning_curve2004(learn_curve,Ca);
+    omega = learning_curve2002(learn_curve,Ca);
     omegas = [omegas; omega];   
 end;
 
 f = figure();
-plot([0 1], [0.5 0.5], 'k--');
+plot([0 1], [0.25 0.25], 'k--');
 hold on;
 plot(calciums,omegas,'r-');
 
