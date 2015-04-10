@@ -55,7 +55,7 @@ if parsedParams.enable_onlyoneinput
 end;
 if parsedParams.enable_100x_speedup
     eta_slope = eta_slope * 100;
-    syn_decay_NMDA = syn_decay_NMDA * 100;
+    %syn_decay_NMDA = syn_decay_NMDA * 100;
     stab.k_minus = 100 * stab.k_minus;
     stab.k_plus = 100 * stab.k_plus;
 end;
@@ -278,7 +278,7 @@ for t=1: Tsim                       % Loop over time
           
           V_BPAP = sum(kernel_BPAP);
           V_H = VRestChanging + V_BPAP;                              % Magnesium unblocking caused by BPAP
-          H = Mg_block(V_H) * (NMDA.Ca_Vrest - V_H);
+          H = - Mg_block(V_H) * (V_H - NMDA.Ca_Vrest);
           
           % ---START former loop
           t_kernel_f_NMDA = (t - spktimes_all) .* (spktimes_all>0 & spktimes_all<t & spktimes_all>(t-val));
@@ -293,7 +293,7 @@ for t=1: Tsim                       % Loop over time
           % ---END former loop
           
           % Learning curve and slope
-          omega = learning_curve2004(learn_curve,Ca);
+          omega = learning_curve2002(learn_curve,Ca);
           eta_val = eta2004(Ca,eta_slope);
           
           % Ca and synaptic weight dynamics
