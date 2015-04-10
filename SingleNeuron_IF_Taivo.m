@@ -273,7 +273,8 @@ for t=1: Tsim                       % Loop over time
           % Only look at recent spikes
           % Might be inefficient; possibly keep track of the first spike in the past that might interest us
           %TODO look here
-          t_kernel =  t - spikes_post(spikes_post>(t-(5*(BPAP.tau_f+BPAP.tau_s)/dt)));
+          spikes_post2 = spikes_post + BPAP.arrival_delay/dt; % simulate BPAP arrival delay
+          t_kernel =  t - spikes_post2(spikes_post2>(t-(5*(BPAP.tau_f+BPAP.tau_s)/dt)) & spikes_post2<=t);
           kernel_BPAP = BPAP.V_amp*(BPAP.I_f*exp(-t_kernel./(BPAP.tau_f/dt))+BPAP.I_s*exp(-t_kernel/(BPAP.tau_s/dt)));
           
           V_BPAP = sum(kernel_BPAP);

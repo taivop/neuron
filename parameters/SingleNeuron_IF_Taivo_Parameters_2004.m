@@ -44,6 +44,7 @@ BPAP.I_f = 0.75;               % #AR0.75 Relative magnitude fast component BPAP
 BPAP.I_s = 0.25;               % #AR0.25 Relative magnitude slow component BPAP
 BPAP.tau_f = 3;                % #AR3 Time constant fast component (in ms)
 BPAP.tau_s = 35;               % #AR35 Time constant slow component (in ms)
+BPAP.arrival_delay = 2;        % #AR2 Delay for BPAP arrival to dendrites (in ms)
 
 %% NMDA plasticity
 
