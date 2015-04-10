@@ -145,6 +145,7 @@ for t=1: Tsim                       % Loop over time
         % Generate input spikes
         if parsedParams.enable_groupedinputs
             [spikes_binary, spiketimes] = GenerateInputSpikesGroupsCorrelated(10, 0.8, 1000, dt, 0);
+            %[spikes_binary, spiketimes] = GenerateInputSpikesGroups(1000, 0.1, '');
         elseif parsedParams.enable_manualinputs
             [spikes_binary, spiketimes] = GenerateInputSpikesManual(100, 1000, dt, 0);
         elseif ~isnan(parsedParams.STDP_deltaT)
