@@ -135,6 +135,10 @@ for t=1: Tsim                       % Loop over time
         t_inner = timesteps_in_1sec;
     end;
     
+    if (mod(t, 100/dt)==1)    % every 100ms
+        g_plas_history = [g_plas_history g_plas];
+    end;
+    
     if (mod(t, timesteps_in_1sec)==1)
         fprintf('t = %5dms, mean exc weight %.2f\n',largebin * 1000 + t_inner, mean(g_plas(rE)));
         
@@ -318,7 +322,6 @@ for t=1: Tsim                       % Loop over time
           gExc_history = [gExc_history gExc];
           V_BPAP_history = [V_BPAP_history V_BPAP];          
           I_NMDA_history = [I_NMDA_history I_NMDA];
-          g_plas_history = [g_plas_history g_plas];
     
 end
 disp('Main loop done.');
