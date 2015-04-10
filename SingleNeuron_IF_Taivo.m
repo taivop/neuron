@@ -37,7 +37,7 @@ addParameter(p,'enable_manualinputs', 0);
 addParameter(p,'numDendrites',120);
 addParameter(p,'endExc',100);
 addParameter(p,'EPSP_amplitude', 3); % in mV, rough value
-addParameter(p,'initialWeightExc', 2);
+addParameter(p,'initialWeightExc', 1);
 addParameter(p,'initialWeightInh', 1);
 addParameter(p,'STDP_deltaT', NaN);
 
