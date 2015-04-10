@@ -1,5 +1,5 @@
 filename_base = 'STDP';
-T_sec = 100;
+T_sec = 1;
 
 % "Pairs of presynaptic and postsynaptic stimuli were repeated 100 times at 1 Hz"
 % deltaT is t_post - t_pre
@@ -24,7 +24,11 @@ for deltaT = deltaTvalues
     end;
     
     % Take into account only the excitatory synapses
-    avg = mean(g_plas(1));
+    if(size(g_plas,1) == 2)
+        avg = mean(g_plas(1));
+    else
+        avg = mean(g_plas(1:100));
+    end;
     
     meanWeights = [meanWeights; avg];
     outputFreqs = [outputFreqs rate_Output];
