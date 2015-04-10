@@ -24,7 +24,7 @@ for deltaT = deltaTvalues
     end;
     
     % Take into account only the excitatory synapses
-    avg = mean(g_plas(1:100));
+    avg = mean(g_plas(1));
     
     meanWeights = [meanWeights; avg];
     outputFreqs = [outputFreqs rate_Output];
