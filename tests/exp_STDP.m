@@ -13,7 +13,7 @@ for deltaT = deltaTvalues
     fprintf('----- RUNNING experiment with deltaT = %dms -----\n', deltaT);
     filename_spec = sprintf('%s_%dms', filename_base,deltaT);
     
-    fileName = SingleNeuron_IF_Taivo(T_sec, 10, filename_spec, 'STDP_deltaT', deltaT);
+    fileName = SingleNeuron_IF_Taivo(T_sec, 10, filename_spec, 'STDP_deltaT', deltaT, 'enable_onlyoneinput', 1);
     load(fileName);
     
     % First take average over last 5 sec
