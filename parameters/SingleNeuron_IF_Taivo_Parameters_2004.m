@@ -75,5 +75,5 @@ stab.k_plus = 8e-7;             % #AR8e-7
 
 %% Various
 dt = 0.1;                       % #AR1 Simulating Time step (ms)
-syn_decay_NMDA = 0.005;         % #AR0.005 Lambda penalty for having a too large weight; 1/lambda = max weight
+syn_decay_NMDA = 0.25;         % #AR0.005 Lambda penalty for having a too large weight; 1/lambda = max weight
 eta_slope = 2e-5;               % #AR2e-5
