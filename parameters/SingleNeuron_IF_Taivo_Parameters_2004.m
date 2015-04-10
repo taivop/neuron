@@ -6,7 +6,7 @@
 %% Integrate-and-fire model
 V_sp_thres = -55;               % #AR-55 (Voltage to define spike has occurred
 V_spike = 40;                   % (none in AR) Voltage a neuron jumps to when spike occurred
-V_reset = -90;                  % # (not said in AR) Voltage a neuron resets to after spiking
+V_reset = -65;                  % # (not said in AR) Voltage a neuron resets to after spiking
 
 gLeak = 1;                      % #AR1 (implicit) Maximal conductivity of leak channel
 gExcMax = 0.03;                 % #AR0.03 Maximal synaptic conductivity (AMPA)
@@ -39,7 +39,7 @@ tau_D_I = 10;
 
 %% BPAP plasticity
 
-BPAP.V_amp = 42;               % #AR42 Amplitude of BPAP (in mV)
+BPAP.V_amp = 60;               % #AR42 Amplitude of BPAP (in mV)
 BPAP.I_f = 0.75;               % #AR0.75 Relative magnitude fast component BPAP
 BPAP.I_s = 0.25;               % #AR0.25 Relative magnitude slow component BPAP
 BPAP.tau_f = 3;                % #AR3 Time constant fast component (in ms)
