@@ -3,7 +3,7 @@ T_sec = 100;
 
 % "Pairs of presynaptic and postsynaptic stimuli were repeated 100 times at 1 Hz"
 % deltaT is t_post - t_pre
-deltaTvalues = [-50 -30 -10 -5 0 5 10 30 50];
+deltaTvalues = [-100 -50 -30 -10 -5 0 5 10 30 50 75 100 125 150 200];
 meanWeights = [];
 outputFreqs = [];
 
