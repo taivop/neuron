@@ -144,7 +144,7 @@ for t=1: Tsim                       % Loop over time
         
         % Generate input spikes
         if parsedParams.enable_groupedinputs
-            [spikes_binary, spiketimes] = GenerateInputSpikesGroupsCorrelated(10, 0.8, 1000, dt, 0);
+            [spikes_binary, spiketimes] = GenerateInputSpikesGroupsCorrelated(30, 0.8, 1000, dt, 0);
             %[spikes_binary, spiketimes] = GenerateInputSpikesGroups(1000, 0.1, '');
         elseif parsedParams.enable_manualinputs
             [spikes_binary, spiketimes] = GenerateInputSpikesManual(100, 1000, dt, 0);
@@ -291,8 +291,8 @@ for t=1: Tsim                       % Loop over time
           tauf(tauf==0) = -Inf;
           taus(taus==0) = -Inf;
           f = NMDA.P0 * sum(NMDA.I_f*exp(tauf)+NMDA.I_s*exp(taus),2);
-          f_history = [f_history f(1)];
-          H_history = [H_history H];
+          %f_history = [f_history f(1)];
+          %H_history = [H_history H];
           I_NMDA = g_NMDA*f*H;
           % ---END former loop
           
@@ -319,10 +319,10 @@ for t=1: Tsim                       % Loop over time
           end;
           
           Ca_history = [Ca_history Ca(1)];
-          VRest_history = [VRest_history VRestChanging];
+          %VRest_history = [VRest_history VRestChanging];
           gExc_history = [gExc_history gExc];
-          V_BPAP_history = [V_BPAP_history V_BPAP];          
-          I_NMDA_history = [I_NMDA_history I_NMDA];
+          %V_BPAP_history = [V_BPAP_history V_BPAP];          
+          %I_NMDA_history = [I_NMDA_history I_NMDA];
     
 end
 disp('Main loop done.');
