@@ -12,11 +12,11 @@ cd ..
 #SBATCH --mem=16000
 
 # Set walltime
-#SBATCH -t 00:40:00
+#SBATCH -t 01:30:00
 
 # Set queue
 #SBATCH -p testing
 
-srun /storage/software/MATLAB_R2013b/bin/matlab -nodisplay -nosplash -nojvm -r "SingleNeuron_IF_Taivo(100, 10, 'singlerun_groupedinputs_correlated', 'enable_groupedinput', 1)"
+srun /storage/software/MATLAB_R2013b/bin/matlab -nodisplay -nosplash -nojvm -r "SingleNeuron_IF_Taivo(200, 10, 'singlerun_groupedinputs_correlated', 'enable_groupedinputs', 1)"
 
 exit
