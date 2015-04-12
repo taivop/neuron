@@ -322,7 +322,7 @@ for t=1: Tsim                       % Loop over time
               g_plas(2:end) = 0;
           end;
           
-          Ca_history = [Ca_history Ca];
+          %Ca_history = [Ca_history Ca];
           %VRest_history = [VRest_history VRestChanging];
           gExc_history = [gExc_history gExc];
           %V_BPAP_history = [V_BPAP_history V_BPAP];          
