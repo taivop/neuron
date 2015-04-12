@@ -36,7 +36,7 @@ addParameter(p,'enable_groupedinputs',0); % if enabled, input rate parameter onl
 addParameter(p,'enable_manualinputs', 0);
 addParameter(p,'numDendrites',120);
 addParameter(p,'endExc',100);
-addParameter(p,'EPSP_amplitude', 1); % in mV, rough value
+addParameter(p,'EPSP_amplitude', 3); % in mV, rough value
 addParameter(p,'initialWeightExc', 1);
 addParameter(p,'initialWeightInh', 1);
 addParameter(p,'STDP_deltaT', NaN);
@@ -90,7 +90,7 @@ n = 0.040275499396172;
 weight_randomness = rand(size(rE)) * 0.10 - 0.05;
 
 g_plas = ones(numDendrites, 1);
-g_plas(rE) = (g_plas(rE) + weight_randomness) * parsedParams.initialWeightExc;
+g_plas(rE) = (g_plas(rE) + weight_randomness*0) * parsedParams.initialWeightExc;
 g_plas(rI) = g_plas(rI) * parsedParams.initialWeightInh;
 if parsedParams.enable_onlyoneinput
     g_plas(2:end) = 0;
