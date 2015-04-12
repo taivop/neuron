@@ -10,7 +10,7 @@
 #SBATCH --mem=16000
 
 # Set walltime
-#SBATCH -t 01:40:00
+#SBATCH -t 02:30:00
 
 # Set queue
 #SBATCH -p testing

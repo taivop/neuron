@@ -13,13 +13,15 @@ function [] = exp_STDP(BPAP_index)
 
     cd ..;
 
+    BPAP_amplitude = BPAP_amplitudes(BPAP_index);
+    
     for deltaT = deltaTvalues
         fprintf('----- RUNNING experiment with deltaT = %dms -----\n', deltaT);
-        filename_spec = sprintf('%s_%dms', filename_base,deltaT);
+        filename_spec = sprintf('%s_amp%d_%dms', filename_base, BPAP_amplitude, deltaT);
 
         fileName = SingleNeuron_IF_Taivo(T_sec, 10, filename_spec, ...
             'STDP_deltaT', deltaT, 'enable_onlyoneinput', 1, ...
-            'BPAP_amplitude', BPAP_amplitudes(BPAP_index));
+            'BPAP_amplitude', BPAP_amplitude);
         load(fileName);
 
         % First take average over last 5 sec
@@ -42,7 +44,7 @@ function [] = exp_STDP(BPAP_index)
 
 
     % Write data to file
-    fileName = sprintf('res_STDP_%s.mat', datestr(now,'yyyy-mm-dd_HH-MM-SS'));
+    fileName = sprintf('res_STDP_amp%d_%s.mat', BPAP_amplitude, datestr(now,'yyyy-mm-dd_HH-MM-SS'));
     cd data_out;
     % Save all the relevant stuff
 
