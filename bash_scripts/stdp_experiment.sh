@@ -17,6 +17,9 @@ cd ../tests
 # Set queue
 #SBATCH -p testing
 
+# Set array of amp indexes
+#SBATCH --array=1-8
+
 srun sh single_STDP_run.sh
 
 exit
