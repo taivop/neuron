@@ -158,7 +158,7 @@ for t=1: Tsim                       % Loop over time
             [spikes_binary, spiketimes] = GenerateInputSpikesUncorrelated(endExc, rate_Input, 1000, dt, 0);
         end;
         
-        [spikes_binary2, spiketimes2] = GenerateInputSpikesUncorrelated(numDendrites-endExc, rate_Input, 1000, dt, 0);            
+        [spikes_binary2, spiketimes2] = GenerateInputSpikesUncorrelated(numDendrites-endExc, 10, 1000, dt, 0);            
         
         fprintf('             measured total input rate: %.0fHz\n', sum(sum(spiketimes ~= 0)));
         %fprintf('             measured total output rate: %.0fHz\n', sum(sum(spiketimes ~= 0)));
