@@ -54,7 +54,7 @@ NMDA.I_f = 0.7;                % #AR0.7 Relative magnitude fast component NMDA c
 NMDA.I_s = 0.3;                % #AR0.3 Relative magnitude slow component NMDA conductance
 NMDA.tau_f = 50;               % #AR50 Time constant fast component (in ms)
 NMDA.tau_s = 200;              % #AR200 Time constant slow component (in ms)
-NMDA.P0 = 0.5;                 % #AR0.5 Fraction of NMDARs shifting to open state.
+NMDA.P0 = 1;                 % #AR0.5 Fraction of NMDARs shifting to open state.
 
 %% Calcium dynamics
 Ca_tau = 20;                   % #AR20 Calcium passive decay time constant (in ms)
