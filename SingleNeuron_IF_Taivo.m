@@ -40,12 +40,16 @@ addParameter(p,'EPSP_amplitude', 3); % in mV, rough value
 addParameter(p,'initialWeightExc', 1);
 addParameter(p,'initialWeightInh', 1);
 addParameter(p,'STDP_deltaT', NaN);
+addParameter(p,'BPAP_amplitude', NaN);
 
 parse(p, varargin{:});
 parsedParams = p.Results; % for saving
 
 numDendrites = parsedParams.numDendrites;
 endExc = parsedParams.endExc;
+if ~isnan(parsedParams.BPAP_amplitude)
+    BPAP.V_amp = parsedParams.BPAP_amplitude;
+end;
 
 %% Change parameters based on options given
 if parsedParams.enable_onlyoneinput

@@ -39,7 +39,7 @@ tau_D_I = 10;
 
 %% BPAP plasticity
 
-BPAP.V_amp = 80;               % #AR42 Amplitude of BPAP (in mV)
+BPAP.V_amp = 60;               % #AR42 Amplitude of BPAP (in mV)
 BPAP.I_f = 0.75;               % #AR0.75 Relative magnitude fast component BPAP
 BPAP.I_s = 0.25;               % #AR0.25 Relative magnitude slow component BPAP
 BPAP.tau_f = 3;                % #AR3 Time constant fast component (in ms)
