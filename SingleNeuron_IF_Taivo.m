@@ -301,7 +301,7 @@ for t=1: Tsim                       % Loop over time
           % ---END former loop
           
           % Learning curve and slope
-          omega = learning_curve2002(learn_curve,Ca);
+          omega = learning_curve2004(learn_curve,Ca);
           eta_val = eta2004(Ca,eta_slope);
           
           % Ca and synaptic weight dynamics
@@ -322,7 +322,7 @@ for t=1: Tsim                       % Loop over time
               g_plas(2:end) = 0;
           end;
           
-          Ca_history = [Ca_history Ca(1)];
+          Ca_history = [Ca_history Ca];
           %VRest_history = [VRest_history VRestChanging];
           gExc_history = [gExc_history gExc];
           %V_BPAP_history = [V_BPAP_history V_BPAP];          

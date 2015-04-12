@@ -39,7 +39,7 @@ tau_D_I = 10;
 
 %% BPAP plasticity
 
-BPAP.V_amp = 60;               % #AR42 Amplitude of BPAP (in mV)
+BPAP.V_amp = 42;               % #AR42 Amplitude of BPAP (in mV)
 BPAP.I_f = 0.75;               % #AR0.75 Relative magnitude fast component BPAP
 BPAP.I_s = 0.25;               % #AR0.25 Relative magnitude slow component BPAP
 BPAP.tau_f = 3;                % #AR3 Time constant fast component (in ms)
@@ -63,10 +63,10 @@ Ca_tau = 20;                   % #AR20 Calcium passive decay time constant (in m
 %% Learning curve (omega)
 % These control LPT and LTF threshold	
 
-learn_curve.alfa1 = 0.35;	   % #AR0.25 | 2002 0.35
-learn_curve.beta1 = 80;		   % #AR60   | 2002 80
-learn_curve.alfa2 = 0.55;	   % #AR0.4  | 2002 0.55
-learn_curve.beta2 = 80;		   % #AR20   | 2002 80
+learn_curve.alfa1 = 0.25;	   % #AR0.25 | 2002 0.35
+learn_curve.beta1 = 60;		   % #AR60   | 2002 80
+learn_curve.alfa2 = 0.4;	   % #AR0.4  | 2002 0.55
+learn_curve.beta2 = 20;		   % #AR20   | 2002 80
 
 %% Metaplasticity
 stab.gt = 4.5e-3;       	    % #AR4.5e-3 Starting value for g_NMDA.
@@ -75,5 +75,5 @@ stab.k_plus = 8e-7;             % #AR8e-7
 
 %% Various
 dt = 0.1;                       % #AR1 Simulating Time step (ms)
-syn_decay_NMDA = 0.25;         % #AR0.005 Lambda penalty for having a too large weight; 1/lambda = max weight
+syn_decay_NMDA = 0.5;         % #AR0.005 Lambda penalty for having a too large weight; 1/lambda = max weight
 eta_slope = 2e-5;               % #AR2e-5
