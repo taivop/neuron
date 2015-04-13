@@ -4,7 +4,7 @@
 %	Matrix(nrSpiketrains x a) -- shows timebin numbers when the spiketrains had spikes. a is the maximum amount of spikes any given train had.
 % Input:
 %	nrSpikeTrains -- number of spike trains to generate, each spike train will be a row of the matrix.
-%	rate -- (in Hz) the mean rate at which the spiketrains should have spikes.
+%	rates -- (in Hz) the mean rate at which the spiketrains should have spikes, or vector (nrSpiketrains x 1) of rates.
 %	T0 -- (in ms) the total amount of time for which the simulation should be done.
 %	dt -- (in ms) the length of one timebin.
 %	fileName -- the filename where output should be saved. If empty, no file will be saved.
@@ -18,13 +18,20 @@ if rate == 0
     return;
 end;
 
+% Rate is same for all synapses => make a vector
+if size(rate, 1) == 1 & size(rate, 2) == 1
+    rates = ones(nrSpikeTrains, 1) * rate;
+else
+    rates = rate;
+end;
+
 
 spikes_binary = zeros(nrSpikeTrains, T0/dt);
 spiketimes = [];
 
 % Build spiketimes matrix
 for j=1:nrSpikeTrains
-    newRow = HomoPoisSpkGenTaivo(rate, T0/1000, dt)';
+    newRow = HomoPoisSpkGenTaivo(rates(j), T0/1000, dt)';
     if j==1
         spiketimes = newRow;
     else
