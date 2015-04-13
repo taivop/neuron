@@ -5,6 +5,8 @@ f = figure;
 plot(deltaTvalues,meanWeights,'k.-','LineWidth',3)
 hold on;
 plot(deltaTvalues,meanWeights,'kx','MarkerSize',10)
+line([min(deltaTvalues) max(deltaTvalues)], [1 1], 'LineStyle', '--');
+ylim([min(0.9, min(meanWeights)), Inf]);
 
 xlabel('post-pre deltaT (ms)')
 ylabel('mean final weight')
