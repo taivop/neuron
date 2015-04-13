@@ -1,5 +1,7 @@
 function [f] = fig_STDPcurve(deltaTvalues, meanWeights)
 
+f = figure;
+
 plot(deltaTvalues,meanWeights,'k.-','LineWidth',3)
 hold on;
 plot(deltaTvalues,meanWeights,'kx','MarkerSize',10)
