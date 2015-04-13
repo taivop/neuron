@@ -34,6 +34,7 @@ addParameter(p,'enable_onlyoneinput',0);
 addParameter(p,'enable_100x_speedup',1);
 addParameter(p,'enable_groupedinputs',0); % if enabled, input rate parameter only applies to inh inputs
 addParameter(p,'enable_manualinputs', 0);
+addParameter(p,'enable_PCA', 0);
 addParameter(p,'numDendrites',120);
 addParameter(p,'endExc',100);
 addParameter(p,'EPSP_amplitude', 3); % in mV, rough value
@@ -151,6 +152,8 @@ for t=1: Tsim                       % Loop over time
             [spikes_binary, spiketimes] = GenerateInputSpikesGroupsCorrelated(rate_Input, 0.8, 1000, dt, 0);
             %[spikes_binary, spiketimes] = GenerateInputSpikesGroups(1000, 0.1, '');
             %[spikes_binary, spiketimes] = GenerateInputSpikesGroupsStochastic(1000, 0.1, '');
+        elseif parsedParams.enable_PCA
+            [spikes_binary, spiketimes, desired_rates] = GenerateInputSpikesPCA();
         elseif parsedParams.enable_manualinputs
             [spikes_binary, spiketimes] = GenerateInputSpikesManual(100, 1000, dt, 0);
         elseif ~isnan(parsedParams.STDP_deltaT)
