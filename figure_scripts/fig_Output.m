@@ -3,7 +3,7 @@ function [f] = fig_Output(spikes_post, T0)
     % Assumes dt=0.1.
     % At edges, the rate is calculated over only a handful of timesteps, so
     % the calculation is inaccurate for the first and last second. These
-    % zones are shown with dashed lines.
+    % zones are not shown.
 
     dt = 0.1;
     
