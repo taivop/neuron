@@ -42,6 +42,7 @@ addParameter(p,'initialWeightExc', 1);
 addParameter(p,'initialWeightInh', 1);
 addParameter(p,'STDP_deltaT', NaN);
 addParameter(p,'BPAP_amplitude', NaN);
+addParameter(p,'load_state_from_file', NaN);
 
 parse(p, varargin{:});
 parsedParams = p.Results; % for saving
@@ -127,11 +128,31 @@ gInh = 0;
 % Time window to check in the past for release of neurotransmitter
 val=5*(NMDA.tau_f+NMDA.tau_s)/dt;
 
+%% Load state from file, if any was given
+if ~isnan(parsedParams.load_state_from_file)
+    stateFilePath = parsedParams.load_state_from_file;
+    oldState = load(stateFilePath);
+    
+    VRestChanging = oldState.VRestChanging;
+    gExc = oldState.gExc;
+    gInh = oldState.gInh;
+    g_NMDA = oldState.g_NMDA;
+    g_plas = oldState.g_plas;
+    Ca = oldState.Ca;
+    spikes_post = oldState.spikes_post;
+    g_plas_history = oldState.g_plas_history;
+    
+end;
+
 %% MAIN LOOP
 
 disp('Running main loop...');
 %waitbar(0);
 timesteps_in_1sec = 1000 / dt;
+
+if ~isnan(parsedParams.BPAP_amplitude)
+    BPAP.V_amp = parsedParams.BPAP_amplitude;
+end;
 
 for t=1: Tsim                       % Loop over time
     largebin = fix((t-1)/timesteps_in_1sec);     % STARTS FROM ZERO. find out which large time bin we are in
@@ -246,7 +267,12 @@ for t=1: Tsim                       % Loop over time
 
                     else
                         V = V_spike;
-                        spikes_post = [spikes_post t];
+                        if ~isnan(parsedParams.load_state_from_file)
+                            spikes_post = [spikes_post t+oldState.T0/dt];
+                        else
+                            spikes_post = [spikes_post t];
+                        end
+                        
                         if (Tsim-t) / timesteps_in_1sec <= 5
                             spikes_last5sec = [spikes_last5sec t];
                         end;
@@ -328,7 +354,7 @@ for t=1: Tsim                       % Loop over time
           
           %Ca_history = [Ca_history Ca];
           %VRest_history = [VRest_history VRestChanging];
-          gExc_history = [gExc_history gExc];
+          %gExc_history = [gExc_history gExc];
           %V_BPAP_history = [V_BPAP_history V_BPAP];          
           %I_NMDA_history = [I_NMDA_history I_NMDA];
     
@@ -366,5 +392,6 @@ save(filePath, 'rate_Input', 'rate_Output','T0','dt','I0','gExcMax','gInhMax', .
     'EPSP_amplitude_norm', 'STOPPER', 'g_NMDA_history', ...
     'f_history', 'spikes_binary', 'spiketimes', 's', 'InputBool', ...
     'VRest_history', 'gExc_history', 'stab', 'I_NMDA_history', ...
-    'BPAP', 'NMDA', 'learn_curve');
+    'BPAP', 'NMDA', 'learn_curve', 'gExc', 'gInh', 'g_NMDA', 'Ca', ...
+    'VRestChanging');
 fprintf('Successfully wrote output to %s\n', filePath);
