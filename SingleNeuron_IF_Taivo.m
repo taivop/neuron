@@ -27,6 +27,7 @@ I0 = 0.0;                       % Basal drive to pyramidal neurons (controls bas
 
 %% Assign optional function argument values if any were given, otherwise use defaults
 p = inputParser;
+addParameter(p,'enable_learning',1);
 addParameter(p,'enable_metaplasticity',1);
 addParameter(p,'enable_inhplasticity',0);
 addParameter(p,'enable_inhdrive',1);
@@ -304,43 +305,43 @@ for t=1: Tsim                       % Loop over time
             
                 Vmat(t)   = V ;
                 
-                
-          %%% Plasticity  &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+          if parsedParams.enable_learning
+              %%% Plasticity  &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+              % Only look at recent spikes
+              spikes_post2 = spikes_post + BPAP.arrival_delay/dt; % simulate BPAP arrival delay
+              t_kernel =  t - spikes_post2(spikes_post2>(t-(5*(BPAP.tau_f+BPAP.tau_s)/dt)) & spikes_post2<=t);
+              kernel_BPAP = BPAP.V_amp*(BPAP.I_f*exp(-t_kernel./(BPAP.tau_f/dt))+BPAP.I_s*exp(-t_kernel/(BPAP.tau_s/dt)));
+
+              V_BPAP = sum(kernel_BPAP);
+              V_H = VRestChanging + V_BPAP;                              % Magnesium unblocking caused by BPAP
+              H = - Mg_block(V_H) * (V_H - NMDA.Ca_Vrest);
+
+              % ---START former loop
+              t_kernel_f_NMDA = (t - spktimes_all) .* (spktimes_all>0 & spktimes_all<t & spktimes_all>(t-val));
+              tauf = -t_kernel_f_NMDA./(NMDA.tau_f/dt);
+              taus = -t_kernel_f_NMDA./(NMDA.tau_s/dt);
+              tauf(tauf==0) = -Inf;
+              taus(taus==0) = -Inf;
+              f = NMDA.P0 * sum(NMDA.I_f*exp(tauf)+NMDA.I_s*exp(taus),2);
+              %f_history = [f_history f(1)];
+              %H_history = [H_history H];
+              I_NMDA = g_NMDA*f*H;
+              % ---END former loop
+
+              % Learning curve and slope
+              omega = learning_curve2004(learn_curve,Ca);
+              eta_val = eta2004(Ca,eta_slope);
+
+              % Ca and synaptic weight dynamics
+              Ca = Ca + dt*(I_NMDA - Ca/Ca_tau);
           
-          % Only look at recent spikes
-          % Might be inefficient; possibly keep track of the first spike in the past that might interest us
-          %TODO look here
-          spikes_post2 = spikes_post + BPAP.arrival_delay/dt; % simulate BPAP arrival delay
-          t_kernel =  t - spikes_post2(spikes_post2>(t-(5*(BPAP.tau_f+BPAP.tau_s)/dt)) & spikes_post2<=t);
-          kernel_BPAP = BPAP.V_amp*(BPAP.I_f*exp(-t_kernel./(BPAP.tau_f/dt))+BPAP.I_s*exp(-t_kernel/(BPAP.tau_s/dt)));
+              g_plas = g_plas + dt*(eta_val.*(omega-syn_decay_NMDA*g_plas));
+          end
           
-          V_BPAP = sum(kernel_BPAP);
-          V_H = VRestChanging + V_BPAP;                              % Magnesium unblocking caused by BPAP
-          H = - Mg_block(V_H) * (V_H - NMDA.Ca_Vrest);
-          
-          % ---START former loop
-          t_kernel_f_NMDA = (t - spktimes_all) .* (spktimes_all>0 & spktimes_all<t & spktimes_all>(t-val));
-          tauf = -t_kernel_f_NMDA./(NMDA.tau_f/dt);
-          taus = -t_kernel_f_NMDA./(NMDA.tau_s/dt);
-          tauf(tauf==0) = -Inf;
-          taus(taus==0) = -Inf;
-          f = NMDA.P0 * sum(NMDA.I_f*exp(tauf)+NMDA.I_s*exp(taus),2);
-          %f_history = [f_history f(1)];
-          %H_history = [H_history H];
-          I_NMDA = g_NMDA*f*H;
-          % ---END former loop
-          
-          % Learning curve and slope
-          omega = learning_curve2004(learn_curve,Ca);
-          eta_val = eta2004(Ca,eta_slope);
-          
-          % Ca and synaptic weight dynamics
-          Ca = Ca + dt*(I_NMDA - Ca/Ca_tau);
-          g_plas = g_plas + dt*(eta_val.*(omega-syn_decay_NMDA*g_plas));
-                    
           % Synaptic stabilization aka metaplasticity
           g_NMDA_history = [g_NMDA_history g_NMDA];
-          if parsedParams.enable_metaplasticity  
+          if parsedParams.enable_metaplasticity & parsedParams.enable_learning
             g_NMDA = g_NMDA + dt*(-(stab.k_minus*(V_H-VRestChanging).^2 + stab.k_plus).*g_NMDA + stab.k_plus*stab.gt);
           end;
           
