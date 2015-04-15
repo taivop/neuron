@@ -1,6 +1,7 @@
 function [spikes_binary, spiketimes] = GenerateInputSpikesExp2(exp, T0, dt, fileName)
     
-    % If we want to put group1 to synapses 76-100, not 1-25.
+    % If we want to put group1 to synapses 76-100, not 1-25, then exp_swap
+    % should be set to 1.
     if exp.swap
         [b1, t1] = GenerateInputSpikesUncorrelated(75, exp.rate_group2, T0, dt, '');
         [b2, t2] = GenerateInputSpikesUncorrelated(25, exp.rate_group1, T0, dt, '');
