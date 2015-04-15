@@ -16,8 +16,6 @@ addpath(fullfile(p,'interface'))
 simulationStartTime = clock;
 
 %% PAR: Set simulation parameters
-desiredCorrelation = 0; % desired correlation for input to excitatory synapses
-
 % Load parameters
 SingleNeuron_IF_Taivo_Parameters_2004;
 
@@ -74,7 +72,6 @@ rI = (startInh:numDendrites)';      % Inhibitory synapses
 
 fprintf('Simulation time: %ds\n', T_sec);
 fprintf('lambda = %.3f\n', syn_decay_NMDA);
-fprintf('desired correlation = %.2f\n', desiredCorrelation);
 fprintf('100x speedup enabled: %d\n', parsedParams.enable_100x_speedup);
 
 %% Initializations
@@ -172,14 +169,17 @@ for t=1: Tsim                       % Loop over time
         
         % Generate input spikes
         if parsedParams.enable_groupedinputs
-            %[spikes_binary, spiketimes] = GenerateInputSpikesGroupsCorrelated(rate_Input, 0.8, 1000, dt, 0);
-            [spikes_binary, spiketimes] = GenerateInputSpikesGroups(1000, 0.1, '');
+            [spikes_binary, spiketimes] = GenerateInputSpikesGroupsCorrelated(rate_Input, 0.8, 1000, dt, 0);
+            %[spikes_binary, spiketimes] = GenerateInputSpikesGroups(1000, 0.1, '');
             %[spikes_binary, spiketimes] = GenerateInputSpikesGroupsStochastic(1000, 0.1, '');
         elseif ~isempty(fieldnames(parsedParams.experiment))
             if parsedParams.experiment.no == 1
                 [spikes_binary, spiketimes] = GenerateInputSpikesExp1(parsedParams.experiment, 1000, 0.1, '');
             elseif parsedParams.experiment.no == 2
                 [spikes_binary, spiketimes] = GenerateInputSpikesExp2(parsedParams.experiment, 1000, 0.1, '');
+            elseif parsedParams.experiment.no == 3
+                [spikes_binary, spiketimes, actual_correlation] = GenerateInputSpikesExp3(parsedParams.experiment, 1000, 0.1, '');
+                exp.actual_correlations(largebin+1) = actual_correlation;
             end;
         elseif parsedParams.enable_PCA
             [spikes_binary, spiketimes, desired_rates] = GenerateInputSpikesPCA();
@@ -405,5 +405,5 @@ save(filePath, 'rate_Input', 'rate_Output','T0','dt','I0','gExcMax','gInhMax', .
     'f_history', 'spikes_binary', 'spiketimes', 's', 'InputBool', ...
     'VRest_history', 'gExc_history', 'stab', 'I_NMDA_history', ...
     'BPAP', 'NMDA', 'learn_curve', 'gExc', 'gInh', 'g_NMDA', 'Ca', ...
-    'VRestChanging');
+    'VRestChanging', 'exp');
 fprintf('Successfully wrote output to %s\n', filePath);

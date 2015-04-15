@@ -31,7 +31,7 @@ fprintf('Output rate for correct bump %.0fHz, for wrong bump %.0fHz.\n', correct
 
 %%
 % Write data to file
-fileName = sprintf('res_exp1_%s.mat', datestr(now,'yyyy-mm-dd_HH-MM-SS'));
+fileName = sprintf('res_exp2_%s.mat', datestr(now,'yyyy-mm-dd_HH-MM-SS'));
 cd exp2/data_out;
 % Save all the relevant stuff
 
