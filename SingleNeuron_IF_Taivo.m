@@ -173,13 +173,14 @@ for t=1: Tsim                       % Loop over time
             %[spikes_binary, spiketimes] = GenerateInputSpikesGroups(1000, 0.1, '');
             %[spikes_binary, spiketimes] = GenerateInputSpikesGroupsStochastic(1000, 0.1, '');
         elseif ~isempty(fieldnames(parsedParams.experiment))
+            experiment = parsedParams.experiment;
             if parsedParams.experiment.no == 1
                 [spikes_binary, spiketimes] = GenerateInputSpikesExp1(parsedParams.experiment, 1000, 0.1, '');
             elseif parsedParams.experiment.no == 2
                 [spikes_binary, spiketimes] = GenerateInputSpikesExp2(parsedParams.experiment, 1000, 0.1, '');
             elseif parsedParams.experiment.no == 3
                 [spikes_binary, spiketimes, actual_correlation] = GenerateInputSpikesExp3(parsedParams.experiment, 1000, 0.1, '');
-                exp.actual_correlations(largebin+1) = actual_correlation;
+                experiment.actual_correlations(largebin+1) = actual_correlation;
             end;
         elseif parsedParams.enable_PCA
             [spikes_binary, spiketimes, desired_rates] = GenerateInputSpikesPCA();
@@ -405,5 +406,5 @@ save(filePath, 'rate_Input', 'rate_Output','T0','dt','I0','gExcMax','gInhMax', .
     'f_history', 'spikes_binary', 'spiketimes', 's', 'InputBool', ...
     'VRest_history', 'gExc_history', 'stab', 'I_NMDA_history', ...
     'BPAP', 'NMDA', 'learn_curve', 'gExc', 'gInh', 'g_NMDA', 'Ca', ...
-    'VRestChanging', 'exp');
+    'VRestChanging', 'experiment');
 fprintf('Successfully wrote output to %s\n', filePath);
