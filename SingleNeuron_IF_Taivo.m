@@ -53,6 +53,7 @@ if ~isnan(parsedParams.BPAP_amplitude)
     BPAP.V_amp = parsedParams.BPAP_amplitude;
 end;
 
+experiment = struct;
 %% Change parameters based on options given
 if parsedParams.enable_onlyoneinput
     numDendrites = 2;
