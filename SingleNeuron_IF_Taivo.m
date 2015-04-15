@@ -44,6 +44,7 @@ addParameter(p,'initialWeightInh', 1);
 addParameter(p,'STDP_deltaT', NaN);
 addParameter(p,'BPAP_amplitude', NaN);
 addParameter(p,'load_state_from_file', NaN);
+addParameter(p,'experiment', struct);
 
 parse(p, varargin{:});
 parsedParams = p.Results; % for saving
@@ -171,9 +172,15 @@ for t=1: Tsim                       % Loop over time
         
         % Generate input spikes
         if parsedParams.enable_groupedinputs
-            [spikes_binary, spiketimes] = GenerateInputSpikesGroupsCorrelated(rate_Input, 0.8, 1000, dt, 0);
-            %[spikes_binary, spiketimes] = GenerateInputSpikesGroups(1000, 0.1, '');
+            %[spikes_binary, spiketimes] = GenerateInputSpikesGroupsCorrelated(rate_Input, 0.8, 1000, dt, 0);
+            [spikes_binary, spiketimes] = GenerateInputSpikesGroups(1000, 0.1, '');
             %[spikes_binary, spiketimes] = GenerateInputSpikesGroupsStochastic(1000, 0.1, '');
+        elseif ~isempty(fieldnames(parsedParams.experiment))
+            if parsedParams.experiment.no == 1
+                [spikes_binary, spiketimes] = GenerateInputSpikesExp1(parsedParams.experiment, 1000, 0.1, '');
+            elseif parsedParams.experiment.no == 2
+                [spikes_binary, spiketimes] = GenerateInputSpikesExp2(parsedParams.experiment, 1000, 0.1, '');
+            end;
         elseif parsedParams.enable_PCA
             [spikes_binary, spiketimes, desired_rates] = GenerateInputSpikesPCA();
         elseif parsedParams.enable_manualinputs
@@ -363,7 +370,11 @@ end
 disp('Main loop done.');
 
 %% Postsynaptic spiking frequency display
-numOfSpikes = length(spikes_post);
+if ~isnan(parsedParams.load_state_from_file)
+    numOfSpikes = length(spikes_post(spikes_post > oldState.T0/dt));
+else
+    numOfSpikes = length(spikes_post);
+end;
 fprintf('Desired input frequency : %.0fHz\n', rate_Input);
 rate_Output = numOfSpikes/(T0/1000);
 fprintf('Output frequency: %.0fHz\n', rate_Output);

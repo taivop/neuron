@@ -14,7 +14,7 @@ function [spikes_binary, spiketimes] = GenerateInputSpikesUncorrelated(nrSpikeTr
 % Corner case: no input given
 if rate == 0
     spikes_binary = zeros(nrSpikeTrains, T0/dt);
-    spiketimes = [];
+    spiketimes = zeros(nrSpikeTrains,1);
     return;
 end;
 
