@@ -184,6 +184,8 @@ for t=1: Tsim                       % Loop over time
                 experiment.actual_correlations(largebin+1) = actual_correlation;
             elseif parsedParams.experiment.no == 4
                 [spikes_binary, spiketimes] = GenerateInputSpikesExp4(parsedParams.experiment, 1000, 0.1, '');
+            elseif parsedParams.experiment.no == 5
+                [spikes_binary, spiketimes] = GenerateInputSpikesExp5(parsedParams.experiment, 1000, 0.1, '');
             end;
         elseif parsedParams.enable_PCA
             [spikes_binary, spiketimes, desired_rates] = GenerateInputSpikesPCA();
