@@ -7,7 +7,7 @@ T_sec = 5;
 counts_group1 = 10:5:50;
 rates_output = [];
 
-generating_states = 0;
+generating_states = 1;
 
 %%
 for j=1:size(counts_group1, 2)   
