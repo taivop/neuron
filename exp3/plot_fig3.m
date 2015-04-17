@@ -5,7 +5,7 @@ adjustment = 0*ones(size(comp.correlations)) * mean(res.rates_output - comp.rate
 
 plot(res.correlations, res.rates_output);
 hold on;
-plot(comp.correlations, comp.rates_output + adjustment);
+plot(comp.correlations, comp.rates_output + adjustment, '--');
 
 legend('Trained with correlated channel', 'Trained without correlation');
 
