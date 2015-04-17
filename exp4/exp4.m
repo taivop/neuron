@@ -7,25 +7,27 @@ T_sec = 5;
 counts_group1 = 10:5:50;
 rates_output = [];
 
-generating_states = 1;
+generating_states = 0;
 
 %%
 for j=1:size(counts_group1, 2)   
    exp.count_group1 = counts_group1(j);
    exp.count_group2 = 100 - exp.count_group1;
-   exp.rate_group2 = 10;
-   exp.rate_group1 = (1750 - exp.rate_group2 * (exp.count_group2))/exp.count_group1;
+   exp.rate_group1 = 50 * 20 / exp.count_group1; % total 1000Hz
+   exp.rate_group2 = (1750 - exp.count_group1 * exp.rate_group1) / exp.count_group2;
    
-   if generating_states
+   [exp.rate_group1, exp.rate_group2]
+   
+   if generating_states && 0
        % Creating state files to load from
        fprintf('---Creating state file with %d-synapse group 1.\n', exp.count_group1);
        outFileName = sprintf('exp4_state_width%dsyn', exp.count_group1);
        SingleNeuron_IF_Taivo(20, 0, outFileName, 'experiment', exp);
-   else
+   elseif 0
        % Running experiments
        fprintf('---Running experiment with %d-synapse group 1.\n', exp.count_group1);
        
-       stateFile = sprintf('exp4/state_files/out_exp4_state_width%dsyn', exp.count_group1);
+       stateFile = sprintf('exp4/state_files2/out_exp4_state_width%dsyn', exp.count_group1);
        fileName = SingleNeuron_IF_Taivo(T_sec, 0, 'exp4',...
            'load_state_from_file', stateFile, 'enable_learning', 0, ...
            'experiment', exp);
