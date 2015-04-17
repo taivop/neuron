@@ -1,6 +1,6 @@
 
 res = load('data_out/results2');
-comp  = load('data_out/results_comparison');
+comp  = load('data_out/results_comparison3');
 
 figure;
 plot(res.counts_group1, res.rates_output);
