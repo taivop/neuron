@@ -1,7 +1,7 @@
 cd ..;
 
 exp.no = 5;
-stateFile = 'exp5/state_to_continue';
+stateFile = 'exp5/state_to_continue_comparison';
 T_sec = 5;
 
 counts_group1 = 0:5:40;

@@ -2,7 +2,7 @@ cd ..;
 
 exp.no = 1;
 
-stateFile = 'exp1/state_to_continue';
+stateFile = 'exp1/state_to_continue_comparison';
 T_sec = 5;
 
 rates_group1 = [0 10 17.5 20 30 40 50 60 70];
@@ -25,7 +25,7 @@ for j=1:size(rates_group1, 2)
 end
 %%
 % Write data to file
-fileName = sprintf('res_exp1_%s.mat', datestr(now,'yyyy-mm-dd_HH-MM-SS'));
+fileName = sprintf('res_exp1_comparison_%s.mat', datestr(now,'yyyy-mm-dd_HH-MM-SS'));
 cd exp1/data_out;
 % Save all the relevant stuff
 
