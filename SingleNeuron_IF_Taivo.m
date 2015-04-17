@@ -182,6 +182,8 @@ for t=1: Tsim                       % Loop over time
             elseif parsedParams.experiment.no == 3
                 [spikes_binary, spiketimes, actual_correlation] = GenerateInputSpikesExp3(parsedParams.experiment, 1000, 0.1, '');
                 experiment.actual_correlations(largebin+1) = actual_correlation;
+            elseif parsedParams.experiment.no == 4
+                [spikes_binary, spiketimes] = GenerateInputSpikesExp4(parsedParams.experiment, 1000, 0.1, '');
             end;
         elseif parsedParams.enable_PCA
             [spikes_binary, spiketimes, desired_rates] = GenerateInputSpikesPCA();
@@ -377,7 +379,6 @@ if ~isnan(parsedParams.load_state_from_file)
 else
     numOfSpikes = length(spikes_post);
 end;
-fprintf('Desired input frequency : %.0fHz\n', rate_Input);
 rate_Output = numOfSpikes/(T0/1000);
 fprintf('Output frequency: %.0fHz\n', rate_Output);
 time = min(T0,5000);
