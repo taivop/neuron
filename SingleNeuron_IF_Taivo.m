@@ -186,6 +186,12 @@ for t=1: Tsim                       % Loop over time
                 [spikes_binary, spiketimes] = GenerateInputSpikesExp4(parsedParams.experiment, 1000, 0.1, '');
             elseif parsedParams.experiment.no == 5
                 [spikes_binary, spiketimes] = GenerateInputSpikesExp5(parsedParams.experiment, 1000, 0.1, '');
+            elseif parsedParams.experiment.no == 6
+                if mod(largebin, 2) == 0
+                    [spikes_binary, spiketimes] = GenerateInputSpikesUncorrelated(100, parsedParams.experiment.rate_noise, 1000, 0.1, '');
+                else
+                    [spikes_binary, spiketimes] = GenerateInputSpikesExp6(parsedParams.experiment, 1000, 0.1, '');
+                end
             end;
         elseif parsedParams.enable_PCA
             [spikes_binary, spiketimes, desired_rates] = GenerateInputSpikesPCA();
@@ -367,8 +373,8 @@ for t=1: Tsim                       % Loop over time
           end;
           
           %Ca_history = [Ca_history Ca];
-          %VRest_history = [VRest_history VRestChanging];
-          %gExc_history = [gExc_history gExc];
+          VRest_history = [VRest_history VRestChanging];
+          gExc_history = [gExc_history gExc];
           %V_BPAP_history = [V_BPAP_history V_BPAP];          
           %I_NMDA_history = [I_NMDA_history I_NMDA];
     
