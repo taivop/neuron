@@ -16,14 +16,12 @@ for j=1:size(counts_group1, 2)
    exp.rate_group1 = 50 * 20 / exp.count_group1; % total 1000Hz
    exp.rate_group2 = (1750 - exp.count_group1 * exp.rate_group1) / exp.count_group2;
    
-   [exp.rate_group1, exp.rate_group2]
-   
-   if generating_states && 0
+   if generating_states
        % Creating state files to load from
        fprintf('---Creating state file with %d-synapse group 1.\n', exp.count_group1);
        outFileName = sprintf('exp4_state_width%dsyn', exp.count_group1);
        SingleNeuron_IF_Taivo(20, 0, outFileName, 'experiment', exp);
-   elseif 0
+   else
        % Running experiments
        fprintf('---Running experiment with %d-synapse group 1.\n', exp.count_group1);
        
