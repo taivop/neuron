@@ -3,7 +3,7 @@ cd ..;
 exp.no = 4;
 T_sec = 5;
 
-state_files_no = 3;
+state_files_no = 9;
 
 counts_group1 = 10:5:50;
 rates_output = [];
@@ -25,7 +25,6 @@ for j=1:size(counts_group1, 2)
    else
        % Running experiments
        fprintf('---Running experiment with %d-synapse group 1.\n', exp.count_group1);
-       
        stateFile = sprintf('exp4/state_files%d/out_exp4_state_width%dsyn', state_files_no, exp.count_group1);
        fileName = SingleNeuron_IF_Taivo(T_sec, 0, 'exp4',...
            'load_state_from_file', stateFile, 'enable_learning', 0, ...
