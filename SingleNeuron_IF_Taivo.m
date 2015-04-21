@@ -34,6 +34,7 @@ addParameter(p,'enable_100x_speedup',1);
 addParameter(p,'enable_groupedinputs',0); % if enabled, input rate parameter only applies to inh inputs
 addParameter(p,'enable_manualinputs', 0);
 addParameter(p,'enable_PCA', 0);
+addParameter(p,'enable_VRest_adaptation', 1);
 addParameter(p,'numDendrites',120);
 addParameter(p,'endExc',100);
 addParameter(p,'EPSP_amplitude', 3); % in mV, rough value
@@ -279,7 +280,9 @@ for t=1: Tsim                       % Loop over time
                 if (V>V_sp_thres)
                     if (V==V_spike)
                         V = V_reset;
-                        VRestChanging = VRestChanging - VRest_adapt;
+                        if parsedParams.enable_VRest_adaptation
+                            VRestChanging = VRestChanging - VRest_adapt;
+                        end;
                         
                         % For numerical stability, use 'natural' values we		
                         % have found previously by seeing where they are		
@@ -321,8 +324,10 @@ for t=1: Tsim                       % Loop over time
                 n = n + dt*(aN.*(1-n) - bN.*n);   
                   
                 % VRest decay towards baseline
-                VRestChanging = VRestChanging + dt / tau_VRest_adapt * (VRest - VRestChanging); 
-               
+                if parsedParams.enable_VRest_adaptation
+                    VRestChanging = VRestChanging + dt / tau_VRest_adapt * (VRest - VRestChanging); 
+                end;
+                
                 end                
             
                 Vmat(t)   = V ;
