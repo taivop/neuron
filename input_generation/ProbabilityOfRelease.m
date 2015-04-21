@@ -1,4 +1,5 @@
 function [spikes_binary, spiketimes] = ProbabilityOfRelease(p, sb, st)
+    T0 = 1000;
     dt = 0.1;
     spikes_binary = zeros(size(sb));
     spiketimes = zeros(size(st));
@@ -18,7 +19,7 @@ function [spikes_binary, spiketimes] = ProbabilityOfRelease(p, sb, st)
         jthRow = st_row_new;
 
         for spktime=jthRow(jthRow ~= 0)
-            spikes_binary(j,ceil(spktime:spktime+1/dt-1)) = 1;
+            spikes_binary(j,ceil(spktime:min(spktime+1/dt-1, T0/dt))) = 1;
         end
     end;
 end
