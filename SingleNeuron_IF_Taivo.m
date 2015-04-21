@@ -194,6 +194,7 @@ for t=1: Tsim                       % Loop over time
                 end
             elseif parsedParams.experiment.no == 7
                 [spikes_binary, spiketimes] = GenerateInputSpikesExp7(parsedParams.experiment, 1000, 0.1, '');
+                g_plas(1:100) = parsedParams.experiment.weights;
             end;
         elseif parsedParams.enable_PCA
             [spikes_binary, spiketimes, desired_rates] = GenerateInputSpikesPCA();
