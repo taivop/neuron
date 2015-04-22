@@ -21,7 +21,7 @@ function [] = exp_InputRate_PR(p_index)
         fprintf('----- RUNNING experiment with input freq %dHz -----\n', inputFreq);
         filename_spec = sprintf('%s-%dHz', filename_base,inputFreq);
         filePath = SingleNeuron_IF_Taivo(T_sec,inputFreq,filename_spec ...
-            ,'experiment', exp);
+            ,'experiment', exp, 'enable_VRest_adaptation', 0);
 
         load(filePath);
 
