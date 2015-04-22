@@ -1,5 +1,5 @@
 
-data_in = load('data_out/results1');
+data_in = load('data_out/results_equal_rates');
 d = data_in.d;
 rates = d.experiment.actual_rates;
 
@@ -8,7 +8,9 @@ origin = d.experiment.means;
 
 % Take only every 10th g_plas_history measurement (because we sampled 10
 % times a sec, but I only want 1 sample a second).
-g_plas_history = d.g_plas_history(:, 10:10:end);
+gp1 = mean(d.g_plas_history(1:50, 10:10:end));
+gp2 = mean(d.g_plas_history(51:100, 10:10:end));
+g_plas_history = [gp1; gp2];
 
 % Start figure
 figure;

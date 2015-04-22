@@ -106,10 +106,14 @@ g_plas0 = g_plas;                               % Save initial values
 Ca = zeros(numDendrites,1);                     % Array for calcium concentration in dendrites
 g_NMDA = stab.gt;                               % Initialize NMDA channel conductivity to stable point (will be changed with metaplasticity)
 
-% Experiment 9 setup
-if ~isempty(fieldnames(parsedParams.experiment)) && parsedParams.experiment.no == 9
-    % Set initial weights
-    g_plas(1:2) = parsedParams.experiment.g_plas;
+% Experiment 9-10 setup
+if ~isempty(fieldnames(parsedParams.experiment))
+    if parsedParams.experiment.no == 9
+        % Set initial weights
+        g_plas(1:2) = parsedParams.experiment.g_plas;
+    elseif parsedParams.experiment.no == 10
+        g_plas(1:100) = parsedParams.experiment.g_plas;
+    end;
     
     % Speed up as necessary
     speedup = parsedParams.experiment.speedup;
@@ -218,6 +222,14 @@ for t=1: Tsim                       % Loop over time
                 experiment.rate1 = y(1);
                 experiment.rate2 = y(2);
                 [spikes_binary, spiketimes] = GenerateInputSpikesExp9(experiment, 1000, 0.1, '');
+                experiment = parsedParams.experiment; % for saving
+            elseif parsedParams.experiment.no == 10
+                % Sample multivariate Gaussian for rates
+                y = mvnrnd(experiment.means, experiment.covs, 1);
+                parsedParams.experiment.actual_rates = [parsedParams.experiment.actual_rates; y];
+                experiment.rate1 = y(1);
+                experiment.rate2 = y(2);
+                [spikes_binary, spiketimes] = GenerateInputSpikesExp10(experiment, 1000, 0.1, '');
                 experiment = parsedParams.experiment; % for saving
             end;
         elseif parsedParams.enable_PCA
