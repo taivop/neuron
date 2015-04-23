@@ -107,7 +107,7 @@ Ca = zeros(numDendrites,1);                     % Array for calcium concentratio
 g_NMDA = stab.gt;                               % Initialize NMDA channel conductivity to stable point (will be changed with metaplasticity)
 
 % Experiment 9-10 setup
-if ~isempty(fieldnames(parsedParams.experiment)) && parsedParams.experiment.no == 9 || parsedParams.experiment.no == 10
+if ~isempty(fieldnames(parsedParams.experiment)) & (parsedParams.experiment.no == 9 || parsedParams.experiment.no == 10)
     if parsedParams.experiment.no == 9
         % Set initial weights
         g_plas(1:2) = parsedParams.experiment.g_plas;
