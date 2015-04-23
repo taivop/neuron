@@ -1,8 +1,8 @@
 function [spikes_binary, spiketimes] = GenerateInputSpikesExp10(exp, T0, dt, ~)
 
     % Get spike trains
-    [sb, st] = GenerateInputSpikesUncorrelated(50, exp.rate1, T0, dt, '');
-    [sb2, st2] = GenerateInputSpikesUncorrelated(50, exp.rate2, T0, dt, '');
+    [sb, st] = GenerateInputSpikesMacke(50, exp.rate1, exp.correlation1, T0, dt, '');
+    [sb2, st2] = GenerateInputSpikesMacke(50, exp.rate2, exp.correlation2, T0, dt, '');
     
     % Concatenate
     spikes_binary = vertcat(sb, sb2);
