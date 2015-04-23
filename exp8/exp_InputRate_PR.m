@@ -13,7 +13,7 @@ function [] = exp_InputRate_PR(p_index)
     cd ..;
     
     exp.no = 8;
-    exp.input_correlation = 0.8;
+    exp.input_correlation = 0.4;
 
     for inputFreq = inputFreqs
         exp.rate = inputFreq;
