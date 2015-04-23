@@ -14,6 +14,7 @@ function [] = exp_InputRate_PR(p_index)
     
     exp.no = 8;
     exp.input_correlation = 0.4;
+    exp.EPSP_amplitude = 0.5;
 
     for inputFreq = inputFreqs
         exp.rate = inputFreq;
@@ -21,7 +22,8 @@ function [] = exp_InputRate_PR(p_index)
         fprintf('----- RUNNING experiment with input freq %dHz -----\n', inputFreq);
         filename_spec = sprintf('%s-%dHz', filename_base,inputFreq);
         filePath = SingleNeuron_IF_Taivo(T_sec,inputFreq,filename_spec ...
-            ,'experiment', exp, 'enable_VRest_adaptation', 0);
+            ,'experiment', exp, 'enable_VRest_adaptation', 0, ...
+            'EPSP_amplitude', exp.EPSP_amplitude);
 
         load(filePath);
 

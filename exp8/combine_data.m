@@ -2,7 +2,7 @@ cd('data/');
 
 files = dir('res_*.mat');
 
-amplitudes = [];
+ps = [];
 inputFreqs = [];
 outputFreqs = [];
 meanWeights = [];
@@ -15,7 +15,7 @@ for file = files'
     outputFreqsRow = d.outputFreqs(sortIndices);
     meanWeightsRow = d.meanWeights(sortIndices)';
     
-    amplitudes = [amplitudes; d.amp];
+    ps = [ps; d.exp.p];
     inputFreqs = [inputFreqs; inputFreqsRow];
     outputFreqs = [outputFreqs; outputFreqsRow];
     meanWeights = [meanWeights; meanWeightsRow];
@@ -23,7 +23,7 @@ for file = files'
 end
 
 % Sorting important data
-[amplitudes, sortIndices] = sort(amplitudes);
+[ps, sortIndices] = sort(ps);
 inputFreqs = inputFreqs(sortIndices,:);
 outputFreqs = outputFreqs(sortIndices,:);
 meanWeights = meanWeights(sortIndices,:);
