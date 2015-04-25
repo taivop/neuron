@@ -1,6 +1,6 @@
 function [] = exp_STDP(BPAP_index)
     
-    BPAP_amplitudes = [42 50 60 70 80 90 100 110];
+    BPAP_amplitudes = [42 50 60 70 80 90 100];
     
     filename_base = 'STDP';
     T_sec = 100;
@@ -21,7 +21,8 @@ function [] = exp_STDP(BPAP_index)
 
         fileName = SingleNeuron_IF_Taivo(T_sec, 10, filename_spec, ...
             'STDP_deltaT', deltaT, 'enable_onlyoneinput', 1, ...
-            'BPAP_amplitude', BPAP_amplitude);
+            'BPAP_amplitude', BPAP_amplitude, 'enable_inhdrive', 0, ...
+            'enable_100x_speedup', 0);
         load(fileName);
 
         % First take average over last 5 sec
