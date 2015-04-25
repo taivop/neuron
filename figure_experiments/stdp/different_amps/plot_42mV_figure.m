@@ -20,6 +20,7 @@ xlabel('\Deltat, ms')
 ylabel('Mean final weight')
 
 % Save into file
+set(gca,'fontsize', 13);
 set(gcf, 'PaperPositionMode', 'manual');
 set(gcf, 'PaperUnits', 'inches');
 set(gcf, 'PaperPosition', [2 2 5.77 4.3275]);

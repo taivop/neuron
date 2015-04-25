@@ -18,6 +18,7 @@ ylabel('Synapse no.');
 c = colorbar;
 c.Label.String = 'Synaptic weight';
 
+set(gca,'fontsize', 13);
 set(gcf, 'PaperPositionMode', 'manual');
 set(gcf, 'PaperUnits', 'inches');
 set(gcf, 'PaperPosition', [2 2 5.77*2 4.3275]);

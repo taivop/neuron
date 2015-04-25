@@ -51,6 +51,7 @@ plot(times, smoothed1);
 ylabel('Output rate, Hz');
 title(sprintf('A. Window size %dms', smooth_window1*1000));
 xlim([2 time_in_sec-2]);
+set(gca,'fontsize', 13);
 
 subplot(2,1,2);
 plot(times, smoothed2);
@@ -61,6 +62,7 @@ xlim([2 time_in_sec-2]);
 line([0 20], [rate_low rate_low], 'Color', 'r', 'LineStyle', '--');
 line([0 20], [rate_high rate_high], 'Color', 'r', 'LineStyle', '--');
 
+set(gca,'fontsize', 13);
 set(gcf, 'PaperPositionMode', 'manual');
 set(gcf, 'PaperUnits', 'inches');
 set(gcf, 'PaperPosition', [2 2 2*5.77 4.3275]);

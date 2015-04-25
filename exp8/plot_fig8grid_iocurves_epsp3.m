@@ -13,7 +13,8 @@ for i = 1:6
     
     plot(inputs, outputs, ...
     'Color','black','Marker','.','MarkerSize',15.0,'LineStyle','-','LineWidth',1.5);
-    
+    set(gca,'fontsize', 13);
+
     axis tight;
     xlim([0, 60]);
     title(sprintf('p=%.1f', p));

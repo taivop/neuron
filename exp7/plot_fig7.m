@@ -22,12 +22,14 @@ for rate=[10 30 50]
     plot(ps, means-stdevs,'r--');
     title('Mean');
     ylabel('Mean output rate, Hz');
+    set(gca,'fontsize', 13);
 
     subplot(2,1,2);
     plot(ps, stdevs, 'r.--', 'MarkerSize', 10);
     title('Standard deviation');
     xlabel('Probability of release');
     ylabel('SD of output rate, Hz');
+    set(gca,'fontsize', 13);
     
     set(gcf, 'PaperPositionMode', 'manual');
     set(gcf, 'PaperUnits', 'inches');

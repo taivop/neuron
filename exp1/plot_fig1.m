@@ -4,12 +4,15 @@ comp  = load('data_out/results_comparison');
 
 f = figure;
 set(f, 'units', 'inches', 'pos', [2 2 5.77 4.3275])
+set(gca,'fontsize', 13);
 hold on;
+box on;
 
-plot(res.rates_group1, res.rates_output, '.-', 'MarkerSize', 10);
-plot(comp.rates_group1, comp.rates_output, '.--', 'MarkerSize', 10);
+plot(res.rates_group1, res.rates_output, '.-', 'MarkerSize', 20, 'LineWidth', 2);
+plot(comp.rates_group1, comp.rates_output, '.--', 'MarkerSize', 20, 'LineWidth', 2);
 
-legend('Neuron trained with high-rate channel', 'Neuron trained on flat input');
+legend({'Neuron trained with high-rate channel', 'Neuron trained on flat input'}, ...
+    'Location', 'southeast');
 xlabel('Input rate to potentiated group, Hz');
 ylabel('Output rate, Hz')
 %title('Filter implemented by the neuron: the dependence of output rate on the degree of trained input present')

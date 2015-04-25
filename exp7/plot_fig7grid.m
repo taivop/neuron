@@ -21,6 +21,7 @@ for i=1:size(rates, 2)
     plot(ps, means, 'b.-', 'LineWidth', 2, 'MarkerSize', 20);
     plot(ps, means+stdevs,'r--');
     plot(ps, means-stdevs,'r--');
+    set(gca,'fontsize', 13);
     title(sprintf('%dHz', rate));
     ylim([0 120]);
     if i==1
@@ -29,6 +30,7 @@ for i=1:size(rates, 2)
 
     subplot(2,3,i+3);
     plot(ps, stdevs, 'r.--', 'MarkerSize', 10);
+    set(gca,'fontsize', 13);
     %title('Standard deviation');
     xlabel('Probability of release');
     ylim([0 8]);

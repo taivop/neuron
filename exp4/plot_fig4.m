@@ -26,6 +26,7 @@ stdevs_comp = std(res_comp.rates_matrix, 1);
 %% Plotting
 f = figure;
 set(f, 'units', 'inches', 'pos', [2 2 5.77 4.3275])
+set(gca,'fontsize', 13);
 hold on;
 
 plot(counts, means, '.-', 'LineWidth', 2, 'MarkerSize', 20);
