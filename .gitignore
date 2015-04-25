@@ -1,6 +1,11 @@
 *.asv
 *.Rhistory
 *.mexa64
+*.png
+*.fig
+*.mat
+*.eps
+*.out
 data_out/
 figures/
 making_faster/
