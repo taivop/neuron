@@ -38,7 +38,7 @@ set(gcf, 'PaperPositionMode', 'manual');
 set(gcf, 'PaperUnits', 'inches');
 set(gcf, 'PaperPosition', [2 2 5.77*2 4.3275]);
 
-print('../../bscthesis/figures/exp8_gridoutputs_epsp0.5.eps', '-depsc');
+print('../../bscthesis/figures/exp8_gridoutputs_epsp05.eps', '-depsc');
 
 %close(f);
 
