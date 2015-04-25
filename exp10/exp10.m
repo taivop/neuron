@@ -3,7 +3,7 @@ cd ..;
 exp.no = 10;
 
 stateFile = NaN;%'exp10/state_to_continue';
-T_sec = 8;
+T_sec = 60;
 
 exp.actual_rates = [];
 
@@ -26,7 +26,9 @@ fileName = SingleNeuron_IF_Taivo(T_sec, 0, 'exp10',...
        'load_state_from_file', stateFile, ...
        'experiment', exp, ...
        'enable_100x_speedup', 0, ...
-       'enable_VRest_adaptation', 0);
+       'enable_VRest_adaptation', 0, ...
+       'EPSP_amplitude', 0.5, ...
+       'BPAP_amplitude', 100);
 
 d = load(fileName);
 

@@ -1,4 +1,4 @@
-cd('data/');
+cd('data/epspamp_0.5/');
 
 files = dir('res_*.mat');
 
@@ -29,8 +29,8 @@ outputFreqs = outputFreqs(sortIndices,:);
 meanWeights = meanWeights(sortIndices,:);
 
 
-fileName = '../combined.mat';
-save(fileName, 'inputFreqs', 'outputFreqs', 'meanWeights', 'amplitudes');
+fileName = '../combined2.mat';
+save(fileName, 'inputFreqs', 'outputFreqs', 'meanWeights', 'ps');
 fprintf('Successfully wrote output to %s\n', fileName);
 
 cd('..');
