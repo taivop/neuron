@@ -1,5 +1,5 @@
 
-data_in = load('data_out/results_equal_rates');
+data_in = load('data_out/results4');
 d = data_in.d;
 rates = d.experiment.actual_rates;
 

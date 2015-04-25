@@ -24,18 +24,25 @@ means_comp = mean(res_comp.rates_matrix, 1);
 stdevs_comp = std(res_comp.rates_matrix, 1);
 
 %% Plotting
-figure;
+f = figure;
+set(f, 'units', 'inches', 'pos', [2 2 5.77 4.3275])
 hold on;
 
-plot(counts, means, 'LineWidth', 2);
+plot(counts, means, '.-', 'LineWidth', 2, 'MarkerSize', 20);
+plot(counts, means_comp, '.-', 'Color', [1 .5 0], 'LineWidth', 2, 'MarkerSize', 20);
 plot(counts, means-stdevs, 'k--');
 plot(counts, means+stdevs, 'k--');
 
-plot(counts, means_comp, 'Color', [1 .5 0], 'LineWidth', 2);
-
-legend('Mean firing rate', '1SD lines');
+legend({'Neuron trained with high-rate channel', 'Neuron trained on flat input', ...
+    '1SD lines'}, 'Location', 'southeast');
 xlabel('Number of synapses in pattern');
 ylabel('Output rate, Hz')
 title('')
 
+set(gcf, 'PaperPositionMode', 'manual');
+set(gcf, 'PaperUnits', 'inches');
+set(gcf, 'PaperPosition', [2 2 5.77 4.3275]);
+print('../../bscthesis/figures/exp4_synapsecount.eps', '-depsc');
+%saveas(f, '../../bscthesis/figures/exp4_synapsecount.eps', 'eps');
+hold off;
 

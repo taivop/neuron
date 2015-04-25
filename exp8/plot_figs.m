@@ -1,4 +1,4 @@
-cd('data/');
+cd('data/epspamp_0.5');
 
 files = dir('res_*.mat');
 
@@ -15,7 +15,7 @@ for file = files'
     title(sprintf('Output rate vs input rate, PR p=%.1f', p));
     
     % Save into file
-    basedir = '../figures';
+    basedir = '../../figures2';
     
     filename_w = sprintf('%s/weights_pr%.1f', basedir, p);
     filename_o = sprintf('%s/iocurve_pr%.1f', basedir, p);

@@ -44,18 +44,27 @@ times = linspace(0, time_in_sec, size(smoothed1, 1));
 % endpoints.
 
 f = figure;
+set(f, 'units', 'inches', 'pos', [2 2 5.77*2 4.3275])
 
 subplot(2,1,1);
 plot(times, smoothed1);
 ylabel('Output rate, Hz');
-title(sprintf('Instantaneous output rate, %.1fs sliding time window', smooth_window1));
+title(sprintf('A. Window size %dms', smooth_window1*1000));
 xlim([2 time_in_sec-2]);
 
 subplot(2,1,2);
 plot(times, smoothed2);
 xlabel('Time, s');
 ylabel('Output rate, Hz');
-title(sprintf('Instantaneous output rate, %.0fs sliding time window', smooth_window2));
+title(sprintf('B. Window size %dms', smooth_window2*1000));
 xlim([2 time_in_sec-2]);
 line([0 20], [rate_low rate_low], 'Color', 'r', 'LineStyle', '--');
 line([0 20], [rate_high rate_high], 'Color', 'r', 'LineStyle', '--');
+
+set(gcf, 'PaperPositionMode', 'manual');
+set(gcf, 'PaperUnits', 'inches');
+set(gcf, 'PaperPosition', [2 2 2*5.77 4.3275]);
+
+print('../../bscthesis/figures/exp6_voltageoscillation.eps', '-depsc');
+%saveas(f, '../../bscthesis/figures/exp6_voltageoscillation.eps', 'eps');
+hold off;
