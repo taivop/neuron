@@ -17,6 +17,6 @@ cd ..
 # Set queue
 #SBATCH -p testing
 
-srun /storage/software/MATLAB_R2013b/bin/matlab -nodisplay -nosplash -nojvm -r "SingleNeuron_IF_Taivo(200, 10, 'singlerun_groupedinputs_correlated', 'enable_groupedinputs', 1)"
+srun /storage/software/MATLAB_R2013b/bin/matlab -nodisplay -nosplash -nojvm -r "SingleNeuron_IF_Taivo(20, 10, 'singlerun_groupedinputs_correlated', 'enable_groupedinputs', 1, 'enable_100x_speedup', 0);"
 
 exit
