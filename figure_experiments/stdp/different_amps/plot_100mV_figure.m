@@ -17,6 +17,7 @@ axis tight;
 title('BPAP amplitude 100mV');
 xlabel('\Deltat, ms')
 ylabel('Mean final weight')
+text(-90, 1.50, 'B', 'FontSize', 50); % Figure letter
 
 % Save into file
 set(gca,'fontsize', 13);

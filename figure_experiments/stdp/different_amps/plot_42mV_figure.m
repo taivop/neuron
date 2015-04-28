@@ -18,6 +18,7 @@ amp = 42;
 title('BPAP amplitude 42mV');
 xlabel('\Deltat, ms')
 ylabel('Mean final weight')
+text(-90, 1.4, 'A', 'FontSize', 50); % Figure letter
 
 % Save into file
 set(gca,'fontsize', 13);

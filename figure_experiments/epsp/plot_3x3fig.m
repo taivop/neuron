@@ -21,7 +21,7 @@ for i = 1:6
     
 end;
 
-xlabel(subplot(2,3,5), 'Mean input activity, Hz');
+xlabel(subplot(2,3,5), 'Mean input rate per synapse, Hz');
 ylabel(subplot(2,3,1), 'Output rate, Hz');
 ylabel(subplot(2,3,4), 'Output rate, Hz');
 
