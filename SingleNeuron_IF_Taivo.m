@@ -31,9 +31,6 @@ addParameter(p,'enable_inhplasticity',0);
 addParameter(p,'enable_inhdrive',1);
 addParameter(p,'enable_onlyoneinput',0);
 addParameter(p,'enable_100x_speedup',1);
-addParameter(p,'enable_groupedinputs',0); % if enabled, input rate parameter only applies to inh inputs
-addParameter(p,'enable_manualinputs', 0);
-addParameter(p,'enable_PCA', 0);
 addParameter(p,'enable_VRest_adaptation', 1);
 addParameter(p,'numDendrites',120);
 addParameter(p,'endExc',100);
@@ -54,7 +51,6 @@ if ~isnan(parsedParams.BPAP_amplitude)
     BPAP.V_amp = parsedParams.BPAP_amplitude;
 end;
 
-experiment = struct;
 %% Change parameters based on options given
 if parsedParams.enable_onlyoneinput
     numDendrites = 2;
@@ -80,13 +76,7 @@ fprintf('100x speedup enabled: %d\n', parsedParams.enable_100x_speedup);
 V = VRest + 0*10*rand(1);             % Initial postsynaptic voltage
 
 % Some parameters to describe how open the gates are		
-myPyrGatingFuns = makePyrGatingFuns;		
-aM = myPyrGatingFuns.alphaM_P(V);		
-bM = myPyrGatingFuns.betaM_P(V);		
-aH = myPyrGatingFuns.alphaH_P(V);		
-bH = myPyrGatingFuns.betaH_P(V);		
-aN = myPyrGatingFuns.alphaN_P(V);		
-bN = myPyrGatingFuns.betaN_P(V);		
+myPyrGatingFuns = makePyrGatingFuns;			
 m = 0.016042971256324;		
 h = 0.995496003155816;		
 n = 0.040275499396172;		
@@ -106,22 +96,6 @@ g_plas0 = g_plas;                               % Save initial values
 Ca = zeros(numDendrites,1);                     % Array for calcium concentration in dendrites
 g_NMDA = stab.gt;                               % Initialize NMDA channel conductivity to stable point (will be changed with metaplasticity)
 
-% Experiment 9-10 setup
-if ~isempty(fieldnames(parsedParams.experiment)) & (parsedParams.experiment.no == 9 || parsedParams.experiment.no == 10)
-    if parsedParams.experiment.no == 9
-        % Set initial weights
-        g_plas(1:2) = parsedParams.experiment.g_plas;
-    elseif parsedParams.experiment.no == 10
-        g_plas(1:100) = parsedParams.experiment.g_plas;
-    end;
-    
-    % Speed up as necessary
-    speedup = parsedParams.experiment.speedup;
-    eta_slope = speedup * eta_slope;
-    stab.k_minus = speedup * stab.k_minus;
-    stab.k_plus = speedup * stab.k_plus;
-end;
-
 
 % Initialisations to save some variables over time
 Ca_history = [];
@@ -140,8 +114,6 @@ spikes_last5sec = [];
 Vmat    = zeros (1,Tsim);                       % Voltage of postsynaptic neuron
 spktimes_all = [];
 VRestChanging = VRest;                          % Initialise resting potential
-gExc = 0;
-gInh = 0;
 
 % Time window to check in the past for release of neurotransmitter
 val=5*(NMDA.tau_f+NMDA.tau_s)/dt;
@@ -165,7 +137,6 @@ end;
 %% MAIN LOOP
 
 disp('Running main loop...');
-%waitbar(0);
 timesteps_in_1sec = 1000 / dt;
 
 if ~isnan(parsedParams.BPAP_amplitude)
@@ -187,65 +158,10 @@ for t=1: Tsim                       % Loop over time
         fprintf('t = %5dms, mean exc weight %.2f\n',largebin * 1000 + t_inner, mean(g_plas(rE)));
         
         % Generate input spikes
-        if parsedParams.enable_groupedinputs
-            [spikes_binary, spiketimes] = GenerateInputSpikesGroupsCorrelated(rate_Input, 0.8, 1000, dt, 0);
-            %[spikes_binary, spiketimes] = GenerateInputSpikesGroups(1000, 0.1, '');
-            %[spikes_binary, spiketimes] = GenerateInputSpikesGroupsStochastic(1000, 0.1, '');
-        elseif ~isempty(fieldnames(parsedParams.experiment))
-            experiment = parsedParams.experiment;
-            if parsedParams.experiment.no == 1
-                [spikes_binary, spiketimes] = GenerateInputSpikesExp1(parsedParams.experiment, 1000, 0.1, '');
-            elseif parsedParams.experiment.no == 2
-                [spikes_binary, spiketimes] = GenerateInputSpikesExp2(parsedParams.experiment, 1000, 0.1, '');
-            elseif parsedParams.experiment.no == 3
-                [spikes_binary, spiketimes, actual_correlation] = GenerateInputSpikesExp3(parsedParams.experiment, 1000, 0.1, '');
-                experiment.actual_correlations(largebin+1) = actual_correlation;
-            elseif parsedParams.experiment.no == 4
-                [spikes_binary, spiketimes] = GenerateInputSpikesExp4(parsedParams.experiment, 1000, 0.1, '');
-            elseif parsedParams.experiment.no == 5
-                [spikes_binary, spiketimes] = GenerateInputSpikesExp5(parsedParams.experiment, 1000, 0.1, '');
-            elseif parsedParams.experiment.no == 6
-                if mod(largebin, 2) == 0
-                    [spikes_binary, spiketimes] = GenerateInputSpikesUncorrelated(100, parsedParams.experiment.rate_noise, 1000, 0.1, '');
-                else
-                    [spikes_binary, spiketimes] = GenerateInputSpikesExp6(parsedParams.experiment, 1000, 0.1, '');
-                end
-            elseif parsedParams.experiment.no == 7
-                [spikes_binary, spiketimes] = GenerateInputSpikesExp7(parsedParams.experiment, 1000, 0.1, '');
-                g_plas(1:100) = parsedParams.experiment.weights;
-            elseif parsedParams.experiment.no == 8
-                [spikes_binary, spiketimes] = GenerateInputSpikesExp8(parsedParams.experiment, 1000, 0.1, '');
-            elseif parsedParams.experiment.no == 9
-                % Sample multivariate Gaussian for rates
-                y = mvnrnd(experiment.means, experiment.covs, 1);
-                parsedParams.experiment.actual_rates = [parsedParams.experiment.actual_rates; y];
-                experiment.rate1 = y(1);
-                experiment.rate2 = y(2);
-                [spikes_binary, spiketimes] = GenerateInputSpikesExp9(experiment, 1000, 0.1, '');
-                experiment = parsedParams.experiment; % for saving
-            elseif parsedParams.experiment.no == 10
-                % Sample multivariate Gaussian for rates
-                y = mvnrnd(experiment.means, experiment.covs, 1);
-                parsedParams.experiment.actual_rates = [parsedParams.experiment.actual_rates; y];
-                experiment.rate1 = y(1);
-                experiment.rate2 = y(2);
-                [spikes_binary, spiketimes] = GenerateInputSpikesExp10(experiment, 1000, 0.1, '');
-                experiment = parsedParams.experiment; % for saving
-            end;
-        elseif parsedParams.enable_PCA
-            [spikes_binary, spiketimes, desired_rates] = GenerateInputSpikesPCA();
-        elseif parsedParams.enable_manualinputs
-            [spikes_binary, spiketimes] = GenerateInputSpikesManual(100, 1000, dt, 0);
-        elseif ~isnan(parsedParams.STDP_deltaT)
-            [spikes_binary, spiketimes] = GenerateInputSpikesSTDP(endExc, parsedParams.STDP_deltaT, 1000, dt, 0);
-        else
-            [spikes_binary, spiketimes] = GenerateInputSpikesUncorrelated(endExc, rate_Input, 1000, dt, 0);
-        end;
-        
+        [spikes_binary, spiketimes] = GenerateInputSpikesUncorrelated(endExc, rate_Input, 1000, dt, 0);
         [spikes_binary2, spiketimes2] = GenerateInputSpikesUncorrelated(numDendrites-endExc, 10, 1000, dt, 0);            
         
         fprintf('             measured total input rate: %.0fHz\n', sum(sum(spiketimes ~= 0)));
-        %fprintf('             measured total output rate: %.0fHz\n', sum(sum(spiketimes ~= 0)));
         
         InputBool = [spikes_binary;spikes_binary2];
         
@@ -279,15 +195,14 @@ for t=1: Tsim                       % Loop over time
         
         s = zeros(size(InputBool));  % plays as external input drive
         
-        STOPPER = 1;
         EPSP_amplitude_norm = parsedParams.EPSP_amplitude / 2.6; % we use this to scale EPSP amplitude to desired value
         
-        s(rE,1) = s_lastE + dt*(((1+tanh(V_Input(rE,1)/10))/2).*(1- STOPPER * s_lastE)/tau_R_E -s_lastE/tau_D_E);
-        s(rI,1) = s_lastI + dt*(((1+tanh(V_Input(rI,1)/10))/2).*(1- STOPPER * s_lastI)/tau_R_I -s_lastI/tau_D_I);
+        s(rE,1) = s_lastE + dt*(((1+tanh(V_Input(rE,1)/10))/2).*(1-s_lastE)/tau_R_E -s_lastE/tau_D_E);
+        s(rI,1) = s_lastI + dt*(((1+tanh(V_Input(rI,1)/10))/2).*(1-s_lastI)/tau_R_I -s_lastI/tau_D_I);
         
         for t2=2:timesteps_in_1sec  
-            s(rE,t2) = s(rE,t2-1) + dt*(((1+tanh(V_Input(rE,t2)/10))/2).*(1- STOPPER * s(rE,t2-1))/tau_R_E -s(rE,t2-1)/tau_D_E);   % neurotransmitter concentration at the synapse
-            s(rI,t2) = s(rI,t2-1) + dt*(((1+tanh(V_Input(rI,t2)/10))/2).*(1- STOPPER * s(rI,t2-1))/tau_R_I -s(rI,t2-1)/tau_D_I);   % neurotransmitter concentration at the synapse
+            s(rE,t2) = s(rE,t2-1) + dt*(((1+tanh(V_Input(rE,t2)/10))/2).*(1-s(rE,t2-1))/tau_R_E -s(rE,t2-1)/tau_D_E);   % neurotransmitter concentration at the synapse
+            s(rI,t2) = s(rI,t2-1) + dt*(((1+tanh(V_Input(rI,t2)/10))/2).*(1-s(rI,t2-1))/tau_R_I -s(rI,t2-1)/tau_D_I);   % neurotransmitter concentration at the synapse
         end
         
         %-- neurotransmitter concentrations found
@@ -403,7 +318,7 @@ for t=1: Tsim                       % Loop over time
           
           % Synaptic stabilization aka metaplasticity
           g_NMDA_history = [g_NMDA_history g_NMDA];
-          if parsedParams.enable_metaplasticity & parsedParams.enable_learning
+          if parsedParams.enable_metaplasticity && parsedParams.enable_learning
             g_NMDA = g_NMDA + dt*(-(stab.k_minus*(V_H-VRestChanging).^2 + stab.k_plus).*g_NMDA + stab.k_plus*stab.gt);
           end;
           
@@ -455,9 +370,9 @@ save(filePath, 'rate_Input', 'rate_Output','T0','dt','I0','gExcMax','gInhMax', .
     'totalComputingTime','parsedParams', 'V_BPAP_history', ...
     'spktimes_all','Ca_history','spikes_post', 'g_plas_history', ...
     'spikes_last5sec','rate_Output5','syn_decay_NMDA', 'H_history', ...
-    'EPSP_amplitude_norm', 'STOPPER', 'g_NMDA_history', ...
+    'EPSP_amplitude_norm', 'g_NMDA_history', ...
     'f_history', 'spikes_binary', 'spiketimes', 's', 'InputBool', ...
     'VRest_history', 'gExc_history', 'stab', 'I_NMDA_history', ...
     'BPAP', 'NMDA', 'learn_curve', 'gExc', 'gInh', 'g_NMDA', 'Ca', ...
-    'VRestChanging', 'experiment');
+    'VRestChanging');
 fprintf('Successfully wrote output to %s\n', filePath);
