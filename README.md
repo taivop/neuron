@@ -1,3 +1,3 @@
-This is a biophysically realistic single neuron model based on papers by [Shouval 2002](www.pnas.org/cgi/doi/10.1073/pnas.152343099) and [Yeung 2004](http://www.pnas.org/cgi/doi/10.1073/pnas.0405555101). It was implemented as part of my [Bachelor's thesis](pungas.ee/files/BSc_thesis.pdf) in Computer Science at University of Tartu, supervised by Raul Vicente and Jaan Aru.
+This is a biophysically realistic single neuron model based on papers by [Shouval 2002](www.pnas.org/cgi/doi/10.1073/pnas.152343099) and [Yeung 2004](http://www.pnas.org/cgi/doi/10.1073/pnas.0405555101). It was implemented as part of my [Bachelor's thesis](https://pungas.ee/files/BSc_thesis.pdf) in Computer Science at University of Tartu, supervised by Raul Vicente and Jaan Aru.
 
 Relevant Trello board can be found [here](https://trello.com/b/GcfbuTnH/taivo-s-model).
